@@ -2,15 +2,19 @@ import time
 import os
 from urllib import request
 from zipfile import ZipFile
+from selenium.webdriver import Chrome, ChromeOptions
+from selenium.webdriver.chrome.service import Service
+from selenium.common.exceptions import SessionNotCreatedException
 
 from .Logger import Logger
 from utils import get_driver_versions, get_brave_version
-from constants import VERSION
+from constants import VERSION, BRAVE_PATH, DRIVER_ARGUMENTS
 
 
 class Bot:
     # Private values
     __logger: Logger
+    __driver: Chrome
 
     # Public values
     error: bool
@@ -35,6 +39,10 @@ class Bot:
 
             self.__logger.log("Driver downloaded successfully.", "EVENT")
 
+        self.__driver = self.__initialize_driver()
+        if self.__driver:
+            self.__logger.log("Driver initialized.", "EVENT")
+
     def __download_driver(self) -> bool:
         driver_versions = get_driver_versions()
         brave_version = get_brave_version()
@@ -57,3 +65,32 @@ class Bot:
         os.remove(temp_file)
 
         return True
+
+    def __initialize_driver(self) -> Chrome | None:
+        self.__logger.log("Initializing driver...", "DEBUG")
+
+        options = ChromeOptions()
+        options.binary_location = BRAVE_PATH + "\\brave.exe"
+        options.add_experimental_option("excludeSwitches", ["enable-logging"])
+
+        for argument in DRIVER_ARGUMENTS:
+            options.add_argument(argument)
+
+        try:
+            return Chrome(
+                service=Service(executable_path="./chromedriver.exe"), options=options
+            )
+        except SessionNotCreatedException:
+            os.remove("chromedriver.exe")
+
+            self.__logger.log(
+                "Invalid driver version! Downloading the correct one..", "DEBUG"
+            )
+
+            if not self.__download_driver():
+                self.__logger.log("Couldn't download the driver!", "ERROR")
+                self.error = True
+
+                return
+
+            return self.__initialize_driver()
