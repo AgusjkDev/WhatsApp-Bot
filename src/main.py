@@ -7,10 +7,31 @@ from constants import VERSION
 def main():
     os.system(f"title WhatsApp Bot v{VERSION} by ShadeDev7")
 
-    bot = Bot()
+    bot = None
 
-    if not bot.error:
-        bot.login()
+    try:
+        bot = Bot()
+
+        while True:
+            if bot.error:
+                break
+
+            if not bot.logged:
+                bot.login()
+
+                continue
+
+            os.system("pause")
+    except Exception as e:  # Only for development purposes
+        import traceback
+
+        traceback.print_exception(e)
+        print("\n", e.__class__, "\n")
+
+        pass
+
+    if bot:
+        bot.close()
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 import time
 import os
+import psutil
+import subprocess
 from urllib import request
 from zipfile import ZipFile
 from selenium.webdriver import Chrome, ChromeOptions
@@ -170,3 +172,26 @@ class Bot:
                 self.error = True
 
                 return
+
+    def close(self) -> None:
+        try:
+            self.__logger.log("Closing... Please wait!", "CLOSE")
+
+            # As the driver.quit() method doesn't end brave browser processes,
+            # the only way I found to do it was killing them manually.
+            for process in psutil.process_iter():
+                if (
+                    process.name() == "brave.exe"
+                    and "--test-type=webdriver" in process.cmdline()
+                ):
+                    subprocess.call(
+                        f"taskkill /pid {process.pid} /f /t",
+                        stderr=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL,
+                    )
+
+                    break
+
+            os.system("pause")
+        except:
+            pass
