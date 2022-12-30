@@ -9,6 +9,9 @@ def main():
 
     bot = Bot()
 
+    if not bot.error:
+        bot.login()
+
 
 if __name__ == "__main__":
     main()

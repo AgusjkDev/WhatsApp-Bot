@@ -4,10 +4,19 @@ from urllib import request
 from zipfile import ZipFile
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.chrome.service import Service
-from selenium.common.exceptions import SessionNotCreatedException
+from selenium.common.exceptions import (
+    SessionNotCreatedException,
+    TimeoutException,
+    NoSuchElementException,
+)
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from .Logger import Logger
-from utils import get_driver_versions, get_brave_version
+from utils import get_driver_versions, get_brave_version, show_qr, close_qr
+from enums import Locators, Timeouts, Attempts, Cooldowns
+from exceptions import AlreadyLoggedInException, CouldntLogInException
 from constants import VERSION, BRAVE_PATH, DRIVER_ARGUMENTS
 
 
@@ -18,10 +27,12 @@ class Bot:
 
     # Public values
     error: bool
+    logged: bool
 
     def __init__(self) -> None:
         self.__logger = Logger()
         self.error = False
+        self.logged = False
 
         self.__logger.log(f"Starting WhatsApp Bot v{VERSION}...", "DEBUG")
         time.sleep(3)
@@ -94,3 +105,68 @@ class Bot:
                 return
 
             return self.__initialize_driver()
+
+    def __await_element_load(
+        self, locator: tuple, timeout: int | None = None
+    ) -> WebElement | None:
+        while True:
+            try:
+                return WebDriverWait(self.__driver, timeout if timeout else 5).until(
+                    EC.presence_of_element_located(locator)
+                )
+            except TimeoutException:
+                if not timeout:
+                    continue
+
+                return
+
+    def login(self) -> None:
+        self.__logger.log("Trying to log in...", "DEBUG")
+
+        attempt = 1
+        while True:
+            try:
+                self.__driver.get("https://web.whatsapp.com")
+
+                qr = self.__await_element_load(Locators.QR, Timeouts.QR)
+                if not qr:
+                    try:
+                        if self.__driver.find_element(*Locators.HEADER):
+                            raise AlreadyLoggedInException
+                    except NoSuchElementException:
+                        raise CouldntLogInException
+
+                self.__logger.log("Awaiting QR code scan...", "DEBUG")
+
+                show_qr(qr.get_attribute("data-ref"))
+
+                if not self.__await_element_load(Locators.HEADER, Timeouts.HEADER):
+                    close_qr()
+
+                    raise CouldntLogInException
+
+                close_qr()
+
+                raise AlreadyLoggedInException
+            except AlreadyLoggedInException:
+                self.__logger.log("Logged in.", "EVENT")
+                self.logged = True
+
+                return
+            except CouldntLogInException:
+                if attempt < Attempts.LOGIN:
+                    self.__logger.log(
+                        f"Couldn't log in! Trying again in {Cooldowns.LOGIN} seconds... ({attempt}/{Attempts.LOGIN})",
+                        "ERROR",
+                    )
+                    time.sleep(Cooldowns.LOGIN)
+                    attempt += 1
+
+                    continue
+
+                self.__logger.log(
+                    f"Couldn't log in. ({attempt}/{Attempts.LOGIN})", "ERROR"
+                )
+                self.error = True
+
+                return
