@@ -281,7 +281,7 @@ class Bot:
 
                 return
 
-    def handleMessages(self) -> None:
+    def handle_messages(self) -> None:
         self.__logger.log("Handling messages...", "DEBUG")
 
         pinned_chat = self.__find_pinned_chat()

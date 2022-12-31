@@ -21,7 +21,7 @@ def main():
 
                 continue
 
-            bot.handleMessages()
+            bot.handle_messages()
     except Exception as e:  # Only for development purposes
         import traceback
 
