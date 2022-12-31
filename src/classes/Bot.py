@@ -38,6 +38,7 @@ class Bot:
 
     def __init__(self) -> None:
         self.__logger = Logger()
+        self.__command_handler = CommandHandler()
         self.error = False
         self.logged = False
 
@@ -186,15 +187,17 @@ class Bot:
         except NoSuchElementException:
             return
 
-    def __get_message_data(self, message_container: WebElement) -> object | None:
+    def __get_message_data(
+        self, message_container: WebElement
+    ) -> list[str, str | None] | None:
         try:
             text_container = message_container.find_element(*Locators.TEXT_CONTAINER)
             emojis = text_container.find_elements(*Locators.EMOJIS)
             if not emojis:
-                return {"type": "text", "value": text_container.text}
+                return ["text", text_container.text]
 
             if not text_container.text:
-                return {"type": "invalid"}
+                return ["invalid", None]
 
             for emoji in emojis:
                 emoji_char = emoji.get_attribute("data-plain-text")
@@ -206,7 +209,7 @@ class Bot:
                 *Locators.TEXT_CONTAINER
             )
 
-            return {"type": "text", "value": updated_text_container.text}
+            return ["text", updated_text_container.text]
         except NoSuchElementException:
             for locator in [
                 Locators.ONLY_EMOJIS,
@@ -224,7 +227,7 @@ class Bot:
             ]:
                 try:
                     if message_container.find_element(*locator):
-                        return {"type": "invalid"}
+                        return ["invalid", None]
                 except NoSuchElementException:
                     continue
 
@@ -321,9 +324,11 @@ class Bot:
                     if not message_data:
                         raise CouldntHandleMessageException
 
-                    if message_data["type"] == "text":
+                    message_type, message_value = message_data
+
+                    if message_type == "text":
                         self.__logger.log(
-                            f"{name} ({number}): {message_data['value']}", "DEBUG"
+                            f"{name} ({number}): {message_value}", "DEBUG"
                         )
 
                     time.sleep(1)
