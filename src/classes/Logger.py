@@ -7,9 +7,10 @@ from constants import VERSION
 
 COLORS = {
     "DEBUG": "\033[92m",
+    "ALERT": "\33[93m",
     "EVENT": "\033[94m",
-    "ERROR": "\033[31m",
-    "CLOSE": "\33[33m",
+    "ERROR": "\033[91m",
+    "CLOSE": "\33[96m",
     "RESET": "\033[0m",
 }
 
