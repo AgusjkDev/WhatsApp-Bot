@@ -342,12 +342,12 @@ class Bot:
                     pinned_chat.click()
 
     def close(self) -> None:
-        try:
-            self.__logger.log("Closing... Please wait!", "CLOSE")
+        self.__logger.log("Closing... Please wait!", "CLOSE")
 
-            # As the driver.quit() method doesn't end brave browser processes,
-            # the only way I found to do it was killing them manually.
-            for process in psutil.process_iter():
+        # As the driver.quit() method doesn't end brave browser processes,
+        # the only way I found to do it was killing them manually.
+        for process in psutil.process_iter():
+            try:
                 if (
                     process.name() == "brave.exe"
                     and "--test-type=webdriver" in process.cmdline()
@@ -359,7 +359,7 @@ class Bot:
                     )
 
                     break
+            except:
+                continue
 
-            os.system("pause")
-        except:
-            pass
+        os.system("pause")
