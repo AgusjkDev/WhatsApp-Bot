@@ -4,3 +4,7 @@ class AlreadyLoggedInException(Exception):
 
 class CouldntLogInException(Exception):
     pass
+
+
+class CouldntHandleMessageException(Exception):
+    pass

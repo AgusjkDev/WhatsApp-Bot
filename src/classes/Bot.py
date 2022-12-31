@@ -10,6 +10,7 @@ from selenium.common.exceptions import (
     SessionNotCreatedException,
     TimeoutException,
     NoSuchElementException,
+    StaleElementReferenceException,
 )
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
@@ -18,7 +19,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from .Logger import Logger
 from utils import get_driver_versions, get_brave_version, show_qr, close_qr
 from enums import Locators, Timeouts, Attempts, Cooldowns
-from exceptions import AlreadyLoggedInException, CouldntLogInException
+from exceptions import (
+    AlreadyLoggedInException,
+    CouldntLogInException,
+    CouldntHandleMessageException,
+)
 from constants import VERSION, BRAVE_PATH, DRIVER_ARGUMENTS
 
 
@@ -122,6 +127,109 @@ class Bot:
 
                 return
 
+    def __find_pinned_chat(self) -> WebElement | None:
+        attempt = 1
+        while True:
+            pinned_chat = self.__await_element_load(
+                Locators.PINNED_CHAT, Timeouts.PINNED_CHAT
+            )
+            if pinned_chat:
+                return pinned_chat
+
+            if attempt < Attempts.PINNED_CHAT:
+                self.__driver.get("https://web.whatsapp.com")
+                self.__logger.log(
+                    f"Couldn't find a pinned chat to focus on! Trying again in {Cooldowns.PINNED_CHAT} seconds... ({attempt}/{Attempts.PINNED_CHAT})",
+                    "ERROR",
+                )
+                time.sleep(Cooldowns.PINNED_CHAT)
+                attempt += 1
+
+                continue
+
+            self.__logger.log(
+                f"Couldn't find a pinned chat to focus on. ({attempt}/{Attempts.PINNED_CHAT})",
+                "ERROR",
+            )
+            self.error = True
+
+            return
+
+    def __get_contact_data(self) -> list[str] | None:
+        try:
+            contact_info = self.__driver.find_element(*Locators.CONTACT_INFO)
+
+            try:
+                return [
+                    element.get_attribute("innerText")
+                    for element in [
+                        contact_info.find_element(*Locators.BUSINESS_ACCOUNT_NAME),
+                        contact_info.find_element(*Locators.BUSINESS_ACCOUNT_NUMBER),
+                    ]
+                ]
+            except NoSuchElementException:
+                pass
+
+            name_or_number, alias_or_number = [
+                element.get_attribute("innerText")
+                for element in [
+                    contact_info.find_element(*Locators.CONTACT_NAME_OR_NUMBER),
+                    contact_info.find_element(*Locators.CONTACT_ALIAS_OR_NUMBER),
+                ]
+            ]
+
+            return (
+                [alias_or_number[1:], name_or_number]
+                if alias_or_number.startswith("~")
+                else [name_or_number, alias_or_number]
+            )
+        except NoSuchElementException:
+            return
+
+    def __get_message_data(self, message_container: WebElement) -> object | None:
+        try:
+            text_container = message_container.find_element(*Locators.TEXT_CONTAINER)
+            emojis = text_container.find_elements(*Locators.EMOJIS)
+            if not emojis:
+                return {"type": "text", "value": text_container.text}
+
+            if not text_container.text:
+                return {"type": "invalid"}
+
+            for emoji in emojis:
+                emoji_char = emoji.get_attribute("data-plain-text")
+                self.__driver.execute_script(
+                    f"arguments[0].innerHTML='{emoji_char}'", emoji
+                )
+
+            updated_text_container = message_container.find_element(
+                *Locators.TEXT_CONTAINER
+            )
+
+            return {"type": "text", "value": updated_text_container.text}
+        except NoSuchElementException:
+            for locator in [
+                Locators.ONLY_EMOJIS,
+                Locators.AUDIO,
+                Locators.STICKER,
+                Locators.IMAGE_CONTAINER,
+                Locators.VIDEO,
+                Locators.GIF,
+                Locators.VIEW_ONCE,
+                Locators.DOCUMENT,
+                Locators.LOCATION,
+                Locators.CONTACT,
+                Locators.POLL,
+                Locators.DELETED,
+            ]:
+                try:
+                    if message_container.find_element(*locator):
+                        return {"type": "invalid"}
+                except NoSuchElementException:
+                    continue
+
+            return
+
     def login(self) -> None:
         self.__logger.log("Trying to log in...", "DEBUG")
 
@@ -172,6 +280,66 @@ class Bot:
                 self.error = True
 
                 return
+
+    def handleMessages(self) -> None:
+        self.__logger.log("Handling messages...", "DEBUG")
+
+        pinned_chat = self.__find_pinned_chat()
+        if not pinned_chat:
+            return
+
+        while True:
+            new_chats = self.__driver.find_elements(*Locators.NEW_CHAT)
+            if not new_chats:
+                time.sleep(0.5)
+
+                continue
+
+            for chat in new_chats:
+                name, number = None, None
+
+                time.sleep(0.5)
+
+                try:
+                    chat.click()
+
+                    self.__driver.find_element(*Locators.CHAT_HEADER).click()
+
+                    contact_data = self.__get_contact_data()
+                    if not contact_data:
+                        raise CouldntHandleMessageException
+
+                    name, number = contact_data
+
+                    messages_containers = self.__driver.find_elements(
+                        *Locators.MESSAGE_CONTAINER
+                    )
+                    if not messages_containers:
+                        raise CouldntHandleMessageException
+
+                    message_data = self.__get_message_data(messages_containers[-1])
+                    if not message_data:
+                        raise CouldntHandleMessageException
+
+                    if message_data["type"] == "text":
+                        self.__logger.log(
+                            f"{name} ({number}): {message_data['value']}", "DEBUG"
+                        )
+
+                    time.sleep(1)
+                    pinned_chat.click()
+                except StaleElementReferenceException:
+                    self.__logger.log(
+                        f"{name if name else 'An user'}{f' ({number})' if number else ''} is probably spamming messages!",
+                        "ALERT",
+                    )
+                except CouldntHandleMessageException:
+                    self.__logger.log(
+                        "There was an error handling a message, proceeding.", "ERROR"
+                    )
+
+                    time.sleep(1)
+                    pinned_chat.click()
 
     def close(self) -> None:
         try:

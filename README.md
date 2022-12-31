@@ -3,7 +3,7 @@
 **Objetives:**
 
 -   Show an image with the QR code to log in: ✅
--   Handle incoming messages: ❌
+-   Handle incoming messages: ✅
 -   Create a users table in the DB: ❌
 -   Create a command handler: ❌
     -   Handle commands with arguments: ❌
