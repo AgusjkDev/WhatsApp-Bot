@@ -4,11 +4,11 @@
 
 -   Show an image with the QR code to log in: ✅
 -   Handle incoming messages: ✅
--   Create a users table in the DB: ❌
 -   Create a command handler: ❌
     -   Handle commands with arguments: ❌
-    -   Handle commands by role: ❌
     -   Handle commands with images: ❌
+    -   Handle commands by role: ❌
+-   Save users & executed commands in the DB: ❌
 -   Ignore messages from banned users: ❌
 
 **Commands:**
