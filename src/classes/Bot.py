@@ -15,14 +15,18 @@ from selenium.common.exceptions import (
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 
 from .Logger import Logger
+from .CommandHandler import CommandHandler
 from utils import get_driver_versions, get_brave_version, show_qr, close_qr
 from enums import Locators, Timeouts, Attempts, Cooldowns
 from exceptions import (
     AlreadyLoggedInException,
     CouldntLogInException,
     CouldntHandleMessageException,
+    CouldntHandleCommandException,
 )
 from constants import VERSION, BRAVE_PATH, DRIVER_ARGUMENTS
 
@@ -30,6 +34,7 @@ from constants import VERSION, BRAVE_PATH, DRIVER_ARGUMENTS
 class Bot:
     # Private values
     __logger: Logger
+    __command_handler: CommandHandler
     __driver: Chrome
 
     # Public values
@@ -38,7 +43,6 @@ class Bot:
 
     def __init__(self) -> None:
         self.__logger = Logger()
-        self.__command_handler = CommandHandler()
         self.error = False
         self.logged = False
 
@@ -58,6 +62,7 @@ class Bot:
 
             self.__logger.log("Driver downloaded successfully.", "EVENT")
 
+        self.__command_handler = CommandHandler(self.__logger, self.__send_message)
         self.__driver = self.__initialize_driver()
         if self.__driver:
             self.__logger.log("Driver initialized.", "EVENT")
@@ -158,6 +163,8 @@ class Bot:
 
     def __get_contact_data(self) -> list[str] | None:
         try:
+            self.__driver.find_element(*Locators.CHAT_HEADER).click()
+            time.sleep(0.5)
             contact_info = self.__driver.find_element(*Locators.CONTACT_INFO)
 
             try:
@@ -233,6 +240,21 @@ class Bot:
 
             return
 
+    def __send_message(self, message: str) -> None:
+        input_box = self.__driver.find_element(*Locators.INPUT_BOX)
+
+        lines = message.split("\n")
+        lines_length = len(lines)
+        for index, line in enumerate(lines, start=1):
+            input_box.send_keys(line)
+
+            if index != lines_length:
+                ActionChains(self.__driver).key_down(Keys.SHIFT).send_keys(
+                    Keys.ENTER
+                ).key_up(Keys.SHIFT).perform()
+
+        input_box.send_keys(Keys.ENTER)
+
     def login(self) -> None:
         self.__logger.log("Trying to log in...", "DEBUG")
 
@@ -306,8 +328,6 @@ class Bot:
                 try:
                     chat.click()
 
-                    self.__driver.find_element(*Locators.CHAT_HEADER).click()
-
                     contact_data = self.__get_contact_data()
                     if not contact_data:
                         raise CouldntHandleMessageException
@@ -327,9 +347,7 @@ class Bot:
                     message_type, message_value = message_data
 
                     if message_type == "text":
-                        self.__logger.log(
-                            f"{name} ({number}): {message_value}", "DEBUG"
-                        )
+                        self.__command_handler.execute(name, number, message_value)
 
                     time.sleep(1)
                     pinned_chat.click()
@@ -343,6 +361,9 @@ class Bot:
                         "There was an error handling a message, proceeding.", "ERROR"
                     )
 
+                    time.sleep(1)
+                    pinned_chat.click()
+                except CouldntHandleCommandException:
                     time.sleep(1)
                     pinned_chat.click()
 

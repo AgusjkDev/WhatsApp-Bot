@@ -49,3 +49,4 @@ class Locators:
     CONTACT = (By.XPATH, './/div[@data-testid="vcard-msg"]')
     POLL = (By.XPATH, './/div[@data-testid="poll-bubble"]')
     DELETED = (By.XPATH, './/span[@data-testid="recalled"]')
+    INPUT_BOX = (By.XPATH, '//div[@data-testid="conversation-compose-box-input"]')

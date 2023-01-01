@@ -8,3 +8,4 @@ DRIVER_ARGUMENTS = [
     "--disable-gpu",
     "log-level=3",
 ]
+COMMAND_SYMBOL = "/"
