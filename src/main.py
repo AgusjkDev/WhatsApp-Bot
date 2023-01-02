@@ -1,4 +1,5 @@
 import os
+from selenium.common.exceptions import NoSuchWindowException
 
 from classes import Bot
 from constants import VERSION
@@ -22,13 +23,15 @@ def main():
                 continue
 
             bot.handle_messages()
+
+    except NoSuchWindowException:
+        pass
+
     except Exception as e:  # Only for development purposes
         import traceback
 
         traceback.print_exception(e)
         print("\n", e.__class__, "\n")
-
-        pass
 
     if bot:
         bot.close()

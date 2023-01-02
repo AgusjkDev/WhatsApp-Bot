@@ -8,7 +8,3 @@ class CouldntLogInException(Exception):
 
 class CouldntHandleMessageException(Exception):
     pass
-
-
-class CouldntHandleCommandException(Exception):
-    pass

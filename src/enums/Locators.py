@@ -12,41 +12,27 @@ class Locators:
         By.XPATH,
         '//div[@data-testid="cell-frame-container"]/div[2]/div[2]/div[2]/span[1]/div/span[@aria-label]',
     )
+    NEW_CHAT_CONTAINER = (By.XPATH, "../../../../..")
     CHAT_HEADER = (By.XPATH, '//header[@data-testid="conversation-header"]')
-    CONTACT_INFO = (By.XPATH, '//div[@data-testid="contact-info-drawer"]')
-    BUSINESS_ACCOUNT_NAME = (
+    CHAT_INFO = (By.XPATH, '//div[@data-testid="contact-info-drawer"]')
+    BUSINESS_NAME = (
         By.XPATH,
         ".//div/section/div[1]/div[3]/div[1]/div[1]/span",
     )
-    BUSINESS_ACCOUNT_NUMBER = (
+    BUSINESS_NUMBER = (
         By.XPATH,
         './/div[@data-testid="container_with_separator"]/div/div/span/span',
     )
-    CONTACT_NAME_OR_NUMBER = (By.XPATH, ".//div/section/div[1]/div[2]/h2/span")
-    CONTACT_ALIAS_OR_NUMBER = (By.XPATH, ".//div/section/div[1]/div[2]/div/span/span")
-    CLOSE_CONTACT_INFO = (By.XPATH, '//div[@data-testid="btn-closer-drawer"]')
-    MESSAGE_CONTAINER = (By.XPATH, '//div[contains(@class, "message-in")]')
-    TEXT_CONTAINER = (
+    PERSON_NAME = (By.XPATH, ".//div/section/div[1]/div[2]/div/span/span")
+    PERSON_NUMBER = (By.XPATH, ".//div/section/div[1]/div[2]/h2/span")
+    MESSAGE_CONTAINER = (By.XPATH, '//div[contains(@class, "message-in")]/div/div[1]')
+    MESSAGE_WITH_TEXT = (
         By.XPATH,
-        './/div/div[1]/div[1][not(@data-testid="poll-bubble")]/div[1]/div/span[1]/span',
+        './div[not(contains(@data-testid, "poll-bubble"))]/div[1]/div/span[1]/span',
     )
-    EMOJIS = (By.XPATH, ".//img[@data-plain-text]")
-    ONLY_EMOJIS = (
+    EMOJIS = (By.XPATH, "//img[@data-plain-text]")
+    IMAGE_WITH_TEXT = (
         By.XPATH,
-        ".//div/div[1]/div[1]/div[1]/div/div/span/img[@data-plain-text]",
+        './div[1]/div/div[1]/div[1]/div/img[@alt and contains(@src, "blob")]',
     )
-    AUDIO = (By.XPATH, './/span[@data-testid="audio-play"]')
-    STICKER = (
-        By.XPATH,
-        './/div/div[1]/span/descendant::img[@draggable="false" and not(@crossorigin)]',
-    )
-    IMAGE_CONTAINER = (By.XPATH, './/div[@data-testid="image-thumb"]')
-    VIDEO = (By.XPATH, './/div[@data-testid="video-content"]')
-    GIF = (By.XPATH, './/div[@data-testid="media-state-gif-icon"]')
-    VIEW_ONCE = (By.XPATH, './/span[@data-testid="view-once-sunset"]')
-    DOCUMENT = (By.XPATH, './/button[@data-testid="document-thumb"]')
-    LOCATION = (By.XPATH, './/a[@dir="auto" and @data-plain-text]')
-    CONTACT = (By.XPATH, './/div[@data-testid="vcard-msg"]')
-    POLL = (By.XPATH, './/div[@data-testid="poll-bubble"]')
-    DELETED = (By.XPATH, './/span[@data-testid="recalled"]')
     INPUT_BOX = (By.XPATH, '//div[@data-testid="conversation-compose-box-input"]')

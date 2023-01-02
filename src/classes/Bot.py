@@ -26,7 +26,6 @@ from exceptions import (
     AlreadyLoggedInException,
     CouldntLogInException,
     CouldntHandleMessageException,
-    CouldntHandleCommandException,
 )
 from constants import VERSION, BRAVE_PATH, DRIVER_ARGUMENTS
 
@@ -161,50 +160,46 @@ class Bot:
 
             return
 
-    def __get_contact_data(self) -> list[str] | None:
+    def __get_chat_data(self) -> list[str] | None:
         try:
             self.__driver.find_element(*Locators.CHAT_HEADER).click()
-            time.sleep(0.5)
-            contact_info = self.__driver.find_element(*Locators.CONTACT_INFO)
+            chat_info = self.__driver.find_element(*Locators.CHAT_INFO)
 
             try:
                 return [
                     element.get_attribute("innerText")
                     for element in [
-                        contact_info.find_element(*Locators.BUSINESS_ACCOUNT_NAME),
-                        contact_info.find_element(*Locators.BUSINESS_ACCOUNT_NUMBER),
+                        chat_info.find_element(*Locators.BUSINESS_NAME),
+                        chat_info.find_element(*Locators.BUSINESS_NUMBER),
                     ]
                 ]
             except NoSuchElementException:
                 pass
 
-            name_or_number, alias_or_number = [
-                element.get_attribute("innerText")
+            return [
+                element.get_attribute("innerText").replace("~", "")
                 for element in [
-                    contact_info.find_element(*Locators.CONTACT_NAME_OR_NUMBER),
-                    contact_info.find_element(*Locators.CONTACT_ALIAS_OR_NUMBER),
+                    chat_info.find_element(*Locators.PERSON_NAME),
+                    chat_info.find_element(*Locators.PERSON_NUMBER),
                 ]
             ]
-
-            return (
-                [alias_or_number[1:], name_or_number]
-                if alias_or_number.startswith("~")
-                else [name_or_number, alias_or_number]
-            )
         except NoSuchElementException:
             return
 
-    def __get_message_data(
-        self, message_container: WebElement
-    ) -> list[str, str | None] | None:
-        try:
-            text_container = message_container.find_element(*Locators.TEXT_CONTAINER)
-            emojis = text_container.find_elements(*Locators.EMOJIS)
-            if not emojis:
-                return ["text", text_container.text]
+    def __get_message_data(self) -> dict[str, str] | None:
+        message_containers = self.__driver.find_elements(*Locators.MESSAGE_CONTAINER)
+        if not message_containers:
+            return
 
-            if not text_container.text:
-                return ["invalid", None]
+        message_container = message_containers[-1]
+
+        try:
+            message_with_text = message_container.find_element(
+                *Locators.MESSAGE_WITH_TEXT
+            )
+            emojis = message_with_text.find_elements(*Locators.EMOJIS)
+            if not emojis:
+                return {"type": "text", "value": message_with_text.text}
 
             for emoji in emojis:
                 emoji_char = emoji.get_attribute("data-plain-text")
@@ -212,33 +207,22 @@ class Bot:
                     f"arguments[0].innerHTML='{emoji_char}'", emoji
                 )
 
-            updated_text_container = message_container.find_element(
-                *Locators.TEXT_CONTAINER
+            message_with_text = message_container.find_element(
+                *Locators.MESSAGE_WITH_TEXT
             )
 
-            return ["text", updated_text_container.text]
+            return {"type": "text", "value": message_with_text.text}
         except NoSuchElementException:
-            for locator in [
-                Locators.ONLY_EMOJIS,
-                Locators.AUDIO,
-                Locators.STICKER,
-                Locators.IMAGE_CONTAINER,
-                Locators.VIDEO,
-                Locators.GIF,
-                Locators.VIEW_ONCE,
-                Locators.DOCUMENT,
-                Locators.LOCATION,
-                Locators.CONTACT,
-                Locators.POLL,
-                Locators.DELETED,
-            ]:
-                try:
-                    if message_container.find_element(*locator):
-                        return ["invalid", None]
-                except NoSuchElementException:
-                    continue
+            try:
+                image_with_text = message_container.find_element(
+                    *Locators.IMAGE_WITH_TEXT
+                )
+                image_url = image_with_text.get_attribute("src")
+                image_text = image_with_text.get_attribute("alt")
 
-            return
+                return {"type": "image", "value": image_url, "text": image_text}
+            except NoSuchElementException:
+                return {"type": "invalid"}
 
     def __send_message(self, message: str) -> None:
         input_box = self.__driver.find_element(*Locators.INPUT_BOX)
@@ -309,63 +293,61 @@ class Bot:
     def handle_messages(self) -> None:
         self.__logger.log("Handling messages...", "DEBUG")
 
-        pinned_chat = self.__find_pinned_chat()
-        if not pinned_chat:
-            return
-
         while True:
+            time.sleep(0.25)
+
             new_chats = self.__driver.find_elements(*Locators.NEW_CHAT)
             if not new_chats:
-                time.sleep(0.5)
-
                 continue
 
-            for chat in new_chats:
-                name, number = None, None
+            try:
+                chat = new_chats[-1].find_element(*Locators.NEW_CHAT_CONTAINER)
+            except (NoSuchElementException, StaleElementReferenceException):
+                continue
 
-                time.sleep(0.5)
+            pinned_chat = self.__find_pinned_chat()
+            if not pinned_chat:
+                return
 
-                try:
-                    chat.click()
+            name, number = None, None
 
-                    contact_data = self.__get_contact_data()
-                    if not contact_data:
-                        raise CouldntHandleMessageException
+            try:
+                chat.click()
 
-                    name, number = contact_data
-
-                    messages_containers = self.__driver.find_elements(
-                        *Locators.MESSAGE_CONTAINER
-                    )
-                    if not messages_containers:
-                        raise CouldntHandleMessageException
-
-                    message_data = self.__get_message_data(messages_containers[-1])
-                    if not message_data:
-                        raise CouldntHandleMessageException
-
-                    message_type, message_value = message_data
-
-                    if message_type == "text":
-                        self.__command_handler.execute(name, number, message_value)
-
-                    time.sleep(1)
+                chat_data = self.__get_chat_data()
+                if not chat_data:
                     pinned_chat.click()
-                except StaleElementReferenceException:
-                    self.__logger.log(
-                        f"{name if name else 'An user'}{f' ({number})' if number else ''} is probably spamming messages!",
-                        "ALERT",
-                    )
-                except CouldntHandleMessageException:
-                    self.__logger.log(
-                        "There was an error handling a message, proceeding.", "ERROR"
-                    )
 
-                    time.sleep(1)
-                    pinned_chat.click()
-                except CouldntHandleCommandException:
-                    time.sleep(1)
-                    pinned_chat.click()
+                    continue
+
+                name, number = chat_data
+
+                message_data = self.__get_message_data()
+                if not message_data:
+                    raise CouldntHandleMessageException
+
+                match message_data["type"]:
+                    case "text":
+                        self.__command_handler.execute(
+                            name, number, message_data["value"]
+                        )
+
+                    case "image":
+                        self.__logger.log(
+                            f"{name} ({number}) sent an image ({message_data['value']}) with the text: '{message_data['text']}'.",
+                            "DEBUG",
+                        )
+            except CouldntHandleMessageException:
+                self.__logger.log("There was an error handling a message!", "ERROR")
+
+            except StaleElementReferenceException:  # If we are here and no one has been spamming, there's something wrong.
+                self.__logger.log(
+                    f"{name if name else 'An user'}{f' ({number})' if number else ''} is probably spamming messages!",
+                    "ALERT",
+                )
+
+            finally:
+                pinned_chat.click()
 
     def close(self) -> None:
         self.__logger.log("Closing... Please wait!", "CLOSE")

@@ -1,9 +1,9 @@
+import time
 from typing import Callable
 
 from .Logger import Logger
 from .Command import Command
 from commands import commands
-from exceptions import CouldntHandleCommandException
 from constants import COMMAND_SYMBOL
 
 
@@ -43,6 +43,8 @@ class CommandHandler:
         command = matched_commands[0]
 
         try:
+            time_start = time.time()
+
             if command.args:
                 command.executor(
                     *[
@@ -59,8 +61,10 @@ class CommandHandler:
             else:
                 command.executor()
 
+            total_time = f"{time.time() - time_start:.2f}"
+
             self.__logger.log(
-                f"{name} ({number}) successfully executed a command: {self._command_symbol}{command_name}",
+                f"{name} ({number}) successfully executed a command in {total_time}s: {self._command_symbol}{command_name}",
                 "EVENT",
             )
         except Exception as e:  # Only for development purposes
@@ -73,5 +77,3 @@ class CommandHandler:
 
             traceback.print_exception(e)
             print("\n", e.__class__, "\n")
-
-            raise CouldntHandleCommandException
