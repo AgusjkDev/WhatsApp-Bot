@@ -2,6 +2,7 @@ import time
 import os
 import psutil
 import subprocess
+import shutil
 from urllib import request
 from zipfile import ZipFile
 from selenium.webdriver import Chrome, ChromeOptions
@@ -365,9 +366,14 @@ class Bot:
                         stderr=subprocess.DEVNULL,
                         stdout=subprocess.DEVNULL,
                     )
-
-                    break
             except:
                 continue
 
-        os.system("pause")
+        # After killing the browser, we need to delete all the
+        # temporal files created by its instance.
+        try:
+            temp_folder = os.getenv("TEMP")
+            if temp_folder:
+                shutil.rmtree(temp_folder, ignore_errors=True)
+        except:
+            return

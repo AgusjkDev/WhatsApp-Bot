@@ -24,10 +24,10 @@ def main():
 
             bot.handle_messages()
 
-    except NoSuchWindowException:
+    except (KeyboardInterrupt, NoSuchWindowException):
         pass
 
-    except Exception as e:  # Only for development purposes
+    except BaseException as e:  # Only for development purposes
         import traceback
 
         traceback.print_exception(e)
