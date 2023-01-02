@@ -16,8 +16,6 @@ from selenium.common.exceptions import (
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
 
 from .Logger import Logger
 from .CommandHandler import CommandHandler
@@ -62,10 +60,10 @@ class Bot:
 
             self.__logger.log("Driver downloaded successfully.", "EVENT")
 
-        self.__command_handler = CommandHandler(self.__logger, self.__send_message)
         self.__driver = self.__initialize_driver()
         if self.__driver:
             self.__logger.log("Driver initialized.", "EVENT")
+            self.__command_handler = CommandHandler(self.__driver, self.__logger)
 
     def __download_driver(self) -> bool:
         driver_versions = get_driver_versions()
@@ -224,21 +222,6 @@ class Bot:
                 return {"type": "image", "value": image_url, "text": image_text}
             except NoSuchElementException:
                 return {"type": "invalid"}
-
-    def __send_message(self, message: str) -> None:
-        input_box = self.__driver.find_element(*Locators.INPUT_BOX)
-
-        lines = message.split("\n")
-        lines_length = len(lines)
-        for index, line in enumerate(lines, start=1):
-            input_box.send_keys(line)
-
-            if index != lines_length:
-                ActionChains(self.__driver).key_down(Keys.SHIFT).send_keys(
-                    Keys.ENTER
-                ).key_up(Keys.SHIFT).perform()
-
-        input_box.send_keys(Keys.ENTER)
 
     def login(self) -> None:
         self.__logger.log("Trying to log in...", "DEBUG")

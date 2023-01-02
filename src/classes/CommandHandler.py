@@ -1,24 +1,27 @@
 import time
-from typing import Callable
+from selenium.webdriver import Chrome
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 from .Logger import Logger
 from .Command import Command
 from commands import commands
+from enums import Locators
 from constants import COMMAND_SYMBOL
 
 
 class CommandHandler:
     # Private values
+    __driver: Chrome
     __logger: Logger
 
     # Protected values
-    _send_message: Callable[[str], None]
     _command_symbol: str
     _commands: list[Command]
 
-    def __init__(self, logger: Logger, send_message: Callable[[str], None]) -> None:
+    def __init__(self, driver: Chrome, logger: Logger) -> None:
+        self.__driver = driver
         self.__logger = logger
-        self._send_message = send_message
         self._command_symbol = COMMAND_SYMBOL
         self._commands = []
 
@@ -27,6 +30,21 @@ class CommandHandler:
                 f"Registering command: {self._command_symbol}{command.name}...", "DEBUG"
             )
             self._commands.append(command)
+
+    def _send_message(self, message: str) -> None:
+        input_box = self.__driver.find_element(*Locators.INPUT_BOX)
+
+        lines = message.split("\n")
+        lines_length = len(lines)
+        for index, line in enumerate(lines, start=1):
+            input_box.send_keys(line)
+
+            if index != lines_length:
+                ActionChains(self.__driver).key_down(Keys.SHIFT).send_keys(
+                    Keys.ENTER
+                ).key_up(Keys.SHIFT).perform()
+
+        input_box.send_keys(Keys.ENTER)
 
     def execute(self, name: str, number: str, message: str) -> None:
         if not message.startswith(self._command_symbol):
