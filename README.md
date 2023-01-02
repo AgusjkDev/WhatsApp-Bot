@@ -4,7 +4,7 @@
 
 -   Show an image with the QR code to log in: ✅
 -   Handle incoming messages: ✅
--   Create a command handler: ❌
+-   Create a command handler: ✅
     -   Handle commands with arguments: ❌
     -   Handle commands with images: ❌
     -   Handle commands by role: ❌
@@ -13,8 +13,10 @@
 
 **Commands:**
 
--   /menu ❌
+-   /menu ✅
     -   Returns a list of all the available commands.
+-   /whoami ✅
+    -   Tells you who you are.
 -   /say _\<message>_ ❌
     -   Says the received message.
 -   /send _\<phone number>_**;**_\<message>_ ❌
@@ -30,3 +32,5 @@
     -   Sets the given image as profile picture.
 -   /status _\<message>_ ❌
     -   Sets the given message as profile status.
+-   /resources ❌
+    -   Returns details about CPU and RAM usage.
