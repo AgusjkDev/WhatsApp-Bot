@@ -11,6 +11,7 @@ def whoami_executor(
 
 whoami = Command(
     "whoami",
+    "/whoami",
     "Tells you who you are.",
     whoami_executor,
     ["name", "number", "_send_message"],

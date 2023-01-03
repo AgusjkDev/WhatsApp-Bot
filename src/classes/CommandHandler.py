@@ -97,6 +97,11 @@ class CommandHandler:
 
         command_name = message[1:].split(" ")[0].lower()
 
+        try:
+            kwargs["command_params"] = message[message.index(" ") + 1 :].split(";")
+        except ValueError:
+            pass
+
         matched_commands = [
             command for command in self._commands if command_name == command.name
         ]

@@ -24,6 +24,7 @@ def sticker_executor(
 
 sticker = Command(
     "sticker",
+    "/sticker",
     "Creates a sticker with an image that you provide.",
     sticker_executor,
     ["image", "_download_image", "_create_sticker", "_send_message"],

@@ -5,8 +5,8 @@
 -   Show an image with the QR code to log in: ✅
 -   Handle incoming messages: ✅
 -   Create a command handler: ✅
-    -   Handle commands with arguments: ❌
-    -   Handle commands with images: ❌
+    -   Handle commands with images: ✅
+    -   Handle commands with arguments: ✅
     -   Handle commands by role: ❌
 -   Save users & executed commands in the DB: ❌
 -   Ignore messages from banned users: ❌
@@ -17,8 +17,10 @@
     -   Returns a list of all the available commands.
 -   /whoami ✅
     -   Tells you who you are.
--   /say _\<message>_ ❌
-    -   Says the received message.
+-   /sticker _(with an image)_ ✅
+    -   Creates a sticker with an image that you provide.
+-   /say _\<message>_ ✅
+    -   Replies with the message you sent..
 -   /send _\<phone number>_**;**_\<message>_ ❌
     -   Sends a message to a specified phone number (clarifying that it is your message).
 
