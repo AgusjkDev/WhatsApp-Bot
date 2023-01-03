@@ -7,19 +7,22 @@ from urllib import request
 from zipfile import ZipFile
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import (
     SessionNotCreatedException,
-    TimeoutException,
     NoSuchElementException,
     StaleElementReferenceException,
 )
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 from .Logger import Logger
 from .CommandHandler import CommandHandler
-from utils import get_driver_versions, get_brave_version, show_qr, close_qr
+from utils import (
+    get_driver_versions,
+    get_brave_version,
+    await_element_load,
+    show_qr,
+    close_qr,
+)
 from enums import Locators, Timeouts, Attempts, Cooldowns
 from exceptions import (
     AlreadyLoggedInException,
@@ -117,25 +120,11 @@ class Bot:
 
             return self.__initialize_driver()
 
-    def __await_element_load(
-        self, locator: tuple, timeout: int | None = None
-    ) -> WebElement | None:
-        while True:
-            try:
-                return WebDriverWait(self.__driver, timeout if timeout else 5).until(
-                    EC.presence_of_element_located(locator)
-                )
-            except TimeoutException:
-                if not timeout:
-                    continue
-
-                return
-
     def __find_pinned_chat(self) -> WebElement | None:
         attempt = 1
         while True:
-            pinned_chat = self.__await_element_load(
-                Locators.PINNED_CHAT, Timeouts.PINNED_CHAT
+            pinned_chat = await_element_load(
+                Locators.PINNED_CHAT, self.__driver, timeout=Timeouts.PINNED_CHAT
             )
             if pinned_chat:
                 return pinned_chat
@@ -188,7 +177,7 @@ class Bot:
     def __get_message_data(self) -> dict[str, str] | None:
         message_containers = self.__driver.find_elements(*Locators.MESSAGE_CONTAINER)
         if not message_containers:
-            return
+            raise CouldntHandleMessageException
 
         message_container = message_containers[-1]
 
@@ -198,7 +187,7 @@ class Bot:
             )
             emojis = message_with_text.find_elements(*Locators.EMOJIS)
             if not emojis:
-                return {"type": "text", "value": message_with_text.text}
+                return {"message": message_with_text.text}
 
             for emoji in emojis:
                 emoji_char = emoji.get_attribute("data-plain-text")
@@ -210,18 +199,33 @@ class Bot:
                 *Locators.MESSAGE_WITH_TEXT
             )
 
-            return {"type": "text", "value": message_with_text.text}
+            return {"message": message_with_text.text}
         except NoSuchElementException:
             try:
-                image_with_text = message_container.find_element(
+                image_with_text_container = message_container.find_element(
+                    *Locators.IMAGE_WITH_TEXT_CONTAINER
+                )
+
+                if not await_element_load(
+                    Locators.IMAGE_WITH_TEXT,
+                    image_with_text_container,
+                    timeout=Timeouts.IMAGE_WITH_TEXT,
+                ):
+                    raise CouldntHandleMessageException
+
+                images_with_text = image_with_text_container.find_elements(
                     *Locators.IMAGE_WITH_TEXT
                 )
-                image_url = image_with_text.get_attribute("src")
-                image_text = image_with_text.get_attribute("alt")
+                if not images_with_text:
+                    raise CouldntHandleMessageException
 
-                return {"type": "image", "value": image_url, "text": image_text}
+                image_with_text = images_with_text[-1]
+                image_text = image_with_text.get_attribute("alt")
+                image_url = image_with_text.get_attribute("src")
+
+                return {"message": image_text, "image": image_url}
             except NoSuchElementException:
-                return {"type": "invalid"}
+                return
 
     def login(self) -> None:
         self.__logger.log("Trying to log in...", "DEBUG")
@@ -231,7 +235,7 @@ class Bot:
             try:
                 self.__driver.get("https://web.whatsapp.com")
 
-                qr = self.__await_element_load(Locators.QR, Timeouts.QR)
+                qr = await_element_load(Locators.QR, self.__driver, timeout=Timeouts.QR)
                 if not qr:
                     try:
                         if self.__driver.find_element(*Locators.HEADER):
@@ -243,7 +247,9 @@ class Bot:
 
                 show_qr(qr.get_attribute("data-ref"))
 
-                if not self.__await_element_load(Locators.HEADER, Timeouts.HEADER):
+                if not await_element_load(
+                    Locators.HEADER, self.__driver, timeout=Timeouts.HEADER
+                ):
                     close_qr()
 
                     raise CouldntLogInException
@@ -308,19 +314,11 @@ class Bot:
 
                 message_data = self.__get_message_data()
                 if not message_data:
-                    raise CouldntHandleMessageException
+                    pinned_chat.click()
 
-                match message_data["type"]:
-                    case "text":
-                        self.__command_handler.execute(
-                            name, number, message_data["value"]
-                        )
+                    continue
 
-                    case "image":
-                        self.__logger.log(
-                            f"{name} ({number}) sent an image ({message_data['value']}) with the text: '{message_data['text']}'.",
-                            "DEBUG",
-                        )
+                self.__command_handler.execute(name=name, number=number, **message_data)
             except CouldntHandleMessageException:
                 self.__logger.log("There was an error handling a message!", "ERROR")
 

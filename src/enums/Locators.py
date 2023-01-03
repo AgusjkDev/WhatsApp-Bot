@@ -15,10 +15,7 @@ class Locators:
     NEW_CHAT_CONTAINER = (By.XPATH, "../../../../..")
     CHAT_HEADER = (By.XPATH, '//header[@data-testid="conversation-header"]')
     CHAT_INFO = (By.XPATH, '//div[@data-testid="contact-info-drawer"]')
-    BUSINESS_NAME = (
-        By.XPATH,
-        ".//div/section/div[1]/div[3]/div[1]/div[1]/span",
-    )
+    BUSINESS_NAME = (By.XPATH, ".//div/section/div[1]/div[3]/div[1]/div[1]/span")
     BUSINESS_NUMBER = (
         By.XPATH,
         './/div[@data-testid="container_with_separator"]/div/div/span/span',
@@ -31,8 +28,13 @@ class Locators:
         './div[not(contains(@data-testid, "poll-bubble"))]/div[1]/div/span[1]/span',
     )
     EMOJIS = (By.XPATH, "//img[@data-plain-text]")
-    IMAGE_WITH_TEXT = (
+    IMAGE_WITH_TEXT_CONTAINER = (
         By.XPATH,
-        './div[1]/div/div[1]/div[1]/div/img[@alt and contains(@src, "blob")]',
+        './div[1]/div/div[@data-testid="image-thumb"]/../div[2]/div/span[1]/span/../../../../div[@data-testid="image-thumb"]',
     )
+    IMAGE_WITH_TEXT = (By.XPATH, './div/div/img[@alt and contains(@src, "blob")]')
     INPUT_BOX = (By.XPATH, '//div[@data-testid="conversation-compose-box-input"]')
+    EMOJI_MENU = (By.XPATH, '//button[@data-testid="compose-btn-emoji"]')
+    FILE_INPUT = (By.XPATH, '//input[@type="file"]')
+    SEND_BUTTON = (By.XPATH, '//span[@data-testid="send"]/..')
+    PENDING_MESSAGE = (By.XPATH, '//span[@data-testid="msg-time"]')
