@@ -295,30 +295,20 @@ class Bot:
             except (NoSuchElementException, StaleElementReferenceException):
                 continue
 
-            pinned_chat = self.__find_pinned_chat()
-            if not pinned_chat:
-                return
-
             name, number = None, None
 
             try:
                 chat.click()
 
                 chat_data = self.__get_chat_data()
-                if not chat_data:
-                    pinned_chat.click()
+                if chat_data:
+                    name, number = chat_data
+                    message_data = self.__get_message_data()
+                    if message_data:
+                        self.__command_handler.execute(
+                            name=name, number=number, **message_data
+                        )
 
-                    continue
-
-                name, number = chat_data
-
-                message_data = self.__get_message_data()
-                if not message_data:
-                    pinned_chat.click()
-
-                    continue
-
-                self.__command_handler.execute(name=name, number=number, **message_data)
             except CouldntHandleMessageException:
                 self.__logger.log("There was an error handling a message!", "ERROR")
 
@@ -329,6 +319,10 @@ class Bot:
                 )
 
             finally:
+                pinned_chat = self.__find_pinned_chat()
+                if not pinned_chat:
+                    return
+
                 pinned_chat.click()
 
     def close(self) -> None:
