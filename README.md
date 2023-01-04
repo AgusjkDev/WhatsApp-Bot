@@ -21,8 +21,8 @@
     -   Creates a sticker with an image that you provide.
 -   /say _\<message>_ ✅
     -   Replies with the message you sent..
--   /send _\<phone number>_**;**_\<message>_ ❌
-    -   Sends a message to a specified phone number (clarifying that it is your message).
+-   /send _\<phone number>_**;**_\<message>_ ✅
+    -   Sends a message to a specified phone number, clarifying that it is your message.
 
 **Admin commands:**
 

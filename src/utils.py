@@ -1,6 +1,7 @@
 import requests
 import os
 import subprocess
+import phonenumbers
 from bs4 import BeautifulSoup
 from selenium.webdriver import Chrome
 from selenium.webdriver.remote.webelement import WebElement
@@ -64,3 +65,10 @@ def close_qr() -> None:
         stderr=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
     )
+
+
+def is_valid_phone_number(phone_number: str) -> bool:
+    try:
+        return phonenumbers.is_valid_number(phonenumbers.parse(phone_number))
+    except phonenumbers.NumberParseException:
+        return False

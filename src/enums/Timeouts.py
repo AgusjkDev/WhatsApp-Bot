@@ -6,3 +6,4 @@ class Timeouts:
     IMAGE_WITH_TEXT = 3
     SEND_BUTTON = 3
     PENDING_MESSAGE = 1.25
+    INPUT_BOX = 5

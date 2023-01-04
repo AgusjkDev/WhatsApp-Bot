@@ -38,3 +38,4 @@ class Locators:
     FILE_INPUT = (By.XPATH, '//input[@type="file"]')
     SEND_BUTTON = (By.XPATH, '//span[@data-testid="send"]/..')
     PENDING_MESSAGE = (By.XPATH, '//span[@data-testid="msg-time"]')
+    POPUP_OK_BUTTON = (By.XPATH, '//div[@data-testid="popup-controls-ok"]')

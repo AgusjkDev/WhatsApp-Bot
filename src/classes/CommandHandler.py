@@ -4,6 +4,7 @@ import base64
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 
 from .Logger import Logger
 from .Command import Command
@@ -88,6 +89,26 @@ class CommandHandler:
         await_element_load(
             Locators.PENDING_MESSAGE, self.__driver, timeout=Timeouts.PENDING_MESSAGE
         )
+
+    def _go_to_chat(self, phone_number: str) -> bool:
+        self.__driver.get(f"https://web.whatsapp.com/send/?phone={phone_number}")
+
+        if not await_element_load(
+            Locators.INPUT_BOX, self.__driver, timeout=Timeouts.INPUT_BOX
+        ):
+            try:
+                self.__driver.find_element(*Locators.POPUP_OK_BUTTON).click()
+
+                return False
+            except NoSuchElementException:
+                # One last try to find the input box.
+                try:
+                    if self.__driver.find_element(*Locators.INPUT_BOX):
+                        return True
+                except NoSuchElementException:
+                    return False
+
+        return True
 
     def execute(self, **kwargs) -> None:
         message = kwargs.get("message")
