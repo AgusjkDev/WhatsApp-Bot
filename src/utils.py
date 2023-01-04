@@ -1,5 +1,6 @@
 import requests
 import os
+import psutil
 import subprocess
 import phonenumbers
 from bs4 import BeautifulSoup
@@ -8,7 +9,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-from qrcode import QRCode
+from PIL import Image
 
 from constants import BRAVE_PATH
 
@@ -52,19 +53,28 @@ def await_element_load(
             return
 
 
-def show_qr(qr_string=str) -> None:
-    qr = QRCode(version=1, box_size=7, border=3)
-    qr.add_data(qr_string)
-    qr.make(fit=True)
-    qr.make_image().show()
+def open_qr(qr_image_path: str) -> list[int]:
+    # Add padding to the QR code image.
+    old_qr = Image.open(qr_image_path)
+    width, height = old_qr.size
+    new_qr = Image.new(old_qr.mode, (width + 50, height + 50), (255, 255, 255))
+    new_qr.paste(old_qr, (25, 25))
+    os.remove(qr_image_path)
+    new_qr.save(qr_image_path)
+
+    before_opening = [p.pid for p in psutil.process_iter()]
+    os.system(qr_image_path)
+
+    return [p.pid for p in psutil.process_iter() if p.pid not in before_opening]
 
 
-def close_qr() -> None:
-    subprocess.call(
-        "taskkill /im Microsoft.Photos.exe /f /t",
-        stderr=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-    )
+def kill_process(*pids: int) -> None:
+    for pid in pids:
+        subprocess.call(
+            f"taskkill /pid {pid} /f /t",
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+        )
 
 
 def is_valid_phone_number(phone_number: str) -> bool:

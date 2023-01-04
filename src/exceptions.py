@@ -1,4 +1,4 @@
-class AlreadyLoggedInException(Exception):
+class QrCodeException(Exception):
     pass
 
 

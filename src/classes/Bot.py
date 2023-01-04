@@ -1,7 +1,6 @@
 import time
 import os
 import psutil
-import subprocess
 import shutil
 from urllib import request
 from zipfile import ZipFile
@@ -20,12 +19,12 @@ from utils import (
     get_driver_versions,
     get_brave_version,
     await_element_load,
-    show_qr,
-    close_qr,
+    open_qr,
+    kill_process,
 )
 from enums import Locators, Timeouts, Attempts, Cooldowns
 from exceptions import (
-    AlreadyLoggedInException,
+    QrCodeException,
     CouldntLogInException,
     CouldntHandleMessageException,
 )
@@ -232,36 +231,57 @@ class Bot:
 
         attempt = 1
         while True:
+            qr_temp_file, opened_processes = None, []
+
             try:
                 self.__driver.get("https://web.whatsapp.com")
 
+                if attempt > 1:
+                    if await_element_load(
+                        Locators.LOGGING_IN,
+                        self.__driver,
+                        timeout=Timeouts.ALREADY_LOGGED_IN,
+                    ):
+                        self.__logger.log("Already logged in.", "EVENT")
+                        self.logged = True
+
+                        return
+
                 qr = await_element_load(Locators.QR, self.__driver, timeout=Timeouts.QR)
                 if not qr:
-                    try:
-                        if self.__driver.find_element(*Locators.HEADER):
-                            raise AlreadyLoggedInException
-                    except NoSuchElementException:
-                        raise CouldntLogInException
+                    raise QrCodeException
 
+                qr_temp_file = (
+                    f"{os.getenv('TEMP') or os.getcwd()}\\temp-{int(time.time())}.png"
+                )
+                if not qr.screenshot(qr_temp_file):
+                    raise QrCodeException
+
+                opened_processes = open_qr(qr_temp_file)
                 self.__logger.log("Awaiting QR code scan...", "DEBUG")
 
-                show_qr(qr.get_attribute("data-ref"))
+                if not await_element_load(
+                    Locators.LOGGING_IN, self.__driver, timeout=Timeouts.LOGGING_IN
+                ):
+                    raise CouldntLogInException
+
+                self.__logger.log("Scanned, logging in...", "DEBUG")
 
                 if not await_element_load(
                     Locators.HEADER, self.__driver, timeout=Timeouts.HEADER
                 ):
-                    close_qr()
-
                     raise CouldntLogInException
 
-                close_qr()
-
-                raise AlreadyLoggedInException
-            except AlreadyLoggedInException:
                 self.__logger.log("Logged in.", "EVENT")
                 self.logged = True
 
                 return
+            except QrCodeException:
+                self.__logger.log(
+                    "There was an error with the QR code! Trying again...",
+                    "ERROR",
+                )
+
             except CouldntLogInException:
                 if attempt < Attempts.LOGIN:
                     self.__logger.log(
@@ -279,6 +299,13 @@ class Bot:
                 self.error = True
 
                 return
+
+            finally:
+                if qr_temp_file:
+                    os.remove(qr_temp_file)
+
+                if opened_processes:
+                    kill_process(*opened_processes)
 
     def handle_messages(self) -> None:
         self.__logger.log("Handling messages...", "DEBUG")
@@ -336,11 +363,7 @@ class Bot:
                     process.name() == "brave.exe"
                     and "--test-type=webdriver" in process.cmdline()
                 ):
-                    subprocess.call(
-                        f"taskkill /pid {process.pid} /f /t",
-                        stderr=subprocess.DEVNULL,
-                        stdout=subprocess.DEVNULL,
-                    )
+                    kill_process(process.pid)
             except:
                 continue
 

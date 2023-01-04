@@ -1,6 +1,8 @@
 class Timeouts:
     QR = 10
-    HEADER = 20
+    LOGGING_IN = 45
+    HEADER = 15
+    ALREADY_LOGGED_IN = 5
     PINNED_CHAT = 3
     CONTACT_INFO = 3
     IMAGE_WITH_TEXT = 3
