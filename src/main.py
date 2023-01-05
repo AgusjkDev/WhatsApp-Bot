@@ -1,37 +1,48 @@
 import os
+import time
 from selenium.common.exceptions import NoSuchWindowException
 
-from classes import Bot
+from classes import Logger, Database, Bot
 from constants import VERSION
+
+from traceback import print_exception  # Only for development purposes
 
 
 def main():
     os.system(f"title WhatsApp Bot v{VERSION} by ShadeDev7")
 
-    bot = None
+    logger = Logger()
+    db, bot = None, None
+
+    logger.log(f"Starting WhatsApp Bot v{VERSION}...", "DEBUG")
+    time.sleep(3)
 
     try:
-        bot = Bot()
+        db = Database(logger)
+        if db.connected:
+            bot = Bot(logger, db)
 
-        while True:
-            if bot.error:
-                break
+            while True:
+                if bot.error:
+                    break
 
-            if not bot.logged:
-                bot.login()
+                if not bot.logged:
+                    bot.login()
 
-                continue
+                    continue
 
-            bot.handle_messages()
+                bot.handle_messages()
 
     except (KeyboardInterrupt, NoSuchWindowException):
         pass
 
-    except BaseException as e:  # Only for development purposes
-        import traceback
+    except BaseException as e:
+        logger.log("There was an unexpected error!", "ERROR")
 
-        traceback.print_exception(e)
-        print("\n", e.__class__, "\n")
+        print_exception(e)
+
+    if db:
+        db.close()
 
     if bot:
         bot.close()

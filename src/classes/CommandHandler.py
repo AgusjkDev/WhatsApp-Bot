@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 
 from .Logger import Logger
+from .Database import Database
 from .Command import Command
 from commands import commands
 from utils import await_element_load
@@ -14,19 +15,23 @@ from enums import Locators, Timeouts
 from exceptions import CouldntHandleCommandException
 from constants import COMMAND_SYMBOL
 
+from traceback import print_exception  # Only for development purposes
+
 
 class CommandHandler:
     # Private values
     __driver: Chrome
     __logger: Logger
+    __db: Database
 
     # Protected values
     _command_symbol: str
     _commands: list[Command]
 
-    def __init__(self, driver: Chrome, logger: Logger) -> None:
+    def __init__(self, driver: Chrome, logger: Logger, db: Database) -> None:
         self.__driver = driver
         self.__logger = logger
+        self.__db = db
         self._command_symbol = COMMAND_SYMBOL
         self._commands = []
 
@@ -152,13 +157,13 @@ class CommandHandler:
                 f"{kwargs.get('name')} ({kwargs.get('number')}) successfully executed a command in {total_time}s: {self._command_symbol}{command_name}",
                 "EVENT",
             )
-        except BaseException as e:  # Only for development purposes
+            self.__db.executed_command(
+                kwargs.get("phone_number"), kwargs.get("name"), command_name
+            )
+        except BaseException as e:
             self.__logger.log(
                 f"There was an error handling a command: {self._command_symbol}{command_name}",
                 "ERROR",
             )
 
-            import traceback
-
-            traceback.print_exception(e)
-            print("\n", e.__class__, "\n")
+            print_exception(e)

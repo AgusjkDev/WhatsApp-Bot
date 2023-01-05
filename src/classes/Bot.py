@@ -14,6 +14,7 @@ from selenium.common.exceptions import (
 )
 
 from .Logger import Logger
+from .Database import Database
 from .CommandHandler import CommandHandler
 from utils import (
     get_driver_versions,
@@ -21,6 +22,7 @@ from utils import (
     await_element_load,
     open_qr,
     kill_process,
+    normalize_phone_number,
 )
 from enums import Locators, Timeouts, Attempts, Cooldowns
 from exceptions import (
@@ -41,13 +43,11 @@ class Bot:
     error: bool
     logged: bool
 
-    def __init__(self) -> None:
-        self.__logger = Logger()
+    def __init__(self, logger: Logger, db: Database) -> None:
+        self.__logger = logger
+        self.__db = db
         self.error = False
         self.logged = False
-
-        self.__logger.log(f"Starting WhatsApp Bot v{VERSION}...", "DEBUG")
-        time.sleep(3)
 
         if "chromedriver.exe" not in os.listdir("."):
             self.__logger.log("Driver not found! Downloading it...", "DEBUG")
@@ -65,7 +65,9 @@ class Bot:
         self.__driver = self.__initialize_driver()
         if self.__driver:
             self.__logger.log("Driver initialized.", "EVENT")
-            self.__command_handler = CommandHandler(self.__driver, self.__logger)
+            self.__command_handler = CommandHandler(
+                self.__driver, self.__logger, self.__db
+            )
 
     def __download_driver(self) -> bool:
         driver_versions = get_driver_versions()
@@ -330,11 +332,16 @@ class Bot:
                 chat_data = self.__get_chat_data()
                 if chat_data:
                     name, number = chat_data
-                    message_data = self.__get_message_data()
-                    if message_data:
-                        self.__command_handler.execute(
-                            name=name, number=number, **message_data
-                        )
+                    phone_number = normalize_phone_number(number)
+                    if not self.__db.is_number_banned(phone_number):
+                        message_data = self.__get_message_data()
+                        if message_data:
+                            self.__command_handler.execute(
+                                name=name,
+                                number=number,
+                                phone_number=phone_number,
+                                **message_data,
+                            )
 
             except CouldntHandleMessageException:
                 self.__logger.log("There was an error handling a message!", "ERROR")
@@ -353,7 +360,7 @@ class Bot:
                 pinned_chat.click()
 
     def close(self) -> None:
-        self.__logger.log("Closing... Please wait!", "CLOSE")
+        self.__logger.log("Closing driver instance...", "CLOSE")
 
         # As the driver.quit() method doesn't end brave browser processes,
         # the only way I found to do it was killing them manually.

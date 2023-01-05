@@ -77,6 +77,10 @@ def kill_process(*pids: int) -> None:
         )
 
 
+def normalize_phone_number(number: str) -> str:
+    return "".join([c for c in number if c.isdigit()])
+
+
 def is_valid_phone_number(phone_number: str) -> bool:
     try:
         return phonenumbers.is_valid_number(phonenumbers.parse(phone_number))
