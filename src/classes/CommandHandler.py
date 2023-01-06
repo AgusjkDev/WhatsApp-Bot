@@ -22,16 +22,16 @@ class CommandHandler:
     # Private values
     __driver: Chrome
     __logger: Logger
-    __db: Database
 
     # Protected values
+    _db: Database
     _command_symbol: str
     _commands: list[Command]
 
     def __init__(self, driver: Chrome, logger: Logger, db: Database) -> None:
         self.__driver = driver
         self.__logger = logger
-        self.__db = db
+        self._db = db
         self._command_symbol = COMMAND_SYMBOL
         self._commands = []
 
@@ -177,7 +177,7 @@ class CommandHandler:
                 f"{kwargs.get('name')} ({kwargs.get('number')}) successfully executed a command in {total_time}s: {self._command_symbol}{command_name}",
                 "EVENT",
             )
-            self.__db.executed_command(
+            self._db.executed_command(
                 kwargs.get("phone_number"), kwargs.get("name"), command_name
             )
         except BaseException as e:
