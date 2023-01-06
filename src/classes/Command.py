@@ -4,7 +4,7 @@ from typing import Callable
 class Command:
     # Public values
     name: str
-    usage: str
+    parameters: str
     description: str
     executor: Callable[..., None]
     args: list[str] | None
@@ -12,13 +12,13 @@ class Command:
     def __init__(
         self,
         name: str,
-        usage: str,
+        parameters: list[str],
         description: str,
         executor: Callable[..., None],
         args: list[str] | None = None,
     ) -> None:
         self.name = name
-        self.usage = usage
+        self.parameters = parameters
         self.description = description
         self.executor = executor
         self.args = args

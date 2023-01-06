@@ -10,9 +10,9 @@ def whoami_executor(
 
 
 whoami = Command(
-    "whoami",
-    "/whoami",
-    "Tells you who you are.",
-    whoami_executor,
-    ["name", "number", "_send_message"],
+    name="whoami",
+    parameters=[],
+    description="Tells you who you are.",
+    executor=whoami_executor,
+    args=["name", "number", "_send_message"],
 )

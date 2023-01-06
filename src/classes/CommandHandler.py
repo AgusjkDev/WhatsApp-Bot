@@ -25,19 +25,17 @@ class CommandHandler:
 
     # Protected values
     _db: Database
-    _command_symbol: str
     _commands: list[Command]
 
     def __init__(self, driver: Chrome, logger: Logger, db: Database) -> None:
         self.__driver = driver
         self.__logger = logger
         self._db = db
-        self._command_symbol = COMMAND_SYMBOL
         self._commands = []
 
         for command in commands:
             self.__logger.log(
-                f"Registering command: {self._command_symbol}{command.name}...", "DEBUG"
+                f"Registering command: {COMMAND_SYMBOL}{command.name}...", "DEBUG"
             )
             self._commands.append(command)
 
@@ -138,7 +136,7 @@ class CommandHandler:
     def execute(self, **kwargs) -> None:
         message = kwargs.get("message")
 
-        if not message.startswith(self._command_symbol):
+        if not message.startswith(COMMAND_SYMBOL):
             return
 
         command_name = message[1:].split(" ")[0].lower()
@@ -152,7 +150,9 @@ class CommandHandler:
             command for command in self._commands if command_name == command.name
         ]
         if not matched_commands:
-            return self._send_message("```Unknown command!```\n\nTry using /menu")
+            return self._send_message(
+                f"```Unknown command!```\n\nTry using {COMMAND_SYMBOL}menu"
+            )
 
         command = matched_commands[0]
 
@@ -174,7 +174,7 @@ class CommandHandler:
             total_time = f"{time.time() - time_start:.2f}"
 
             self.__logger.log(
-                f"{kwargs.get('name')} ({kwargs.get('number')}) successfully executed a command in {total_time}s: {self._command_symbol}{command_name}",
+                f"{kwargs.get('name')} ({kwargs.get('number')}) successfully executed a command in {total_time}s: {COMMAND_SYMBOL}{command_name}",
                 "EVENT",
             )
             self._db.executed_command(
@@ -182,7 +182,7 @@ class CommandHandler:
             )
         except BaseException as e:
             self.__logger.log(
-                f"There was an error handling a command: {self._command_symbol}{command_name}",
+                f"There was an error handling a command: {COMMAND_SYMBOL}{command_name}",
                 "ERROR",
             )
 

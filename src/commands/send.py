@@ -37,11 +37,11 @@ def send_executor(
 
 
 send = Command(
-    "send",
-    "/send _<phone number>_;_<message>_",
-    "Sends a message to a specified phone number, clarifying that it is your message.",
-    send_executor,
-    [
+    name="send",
+    parameters=["phone number", "message"],
+    description="Sends a message to a specified phone number, clarifying that it is your message.",
+    executor=send_executor,
+    args=[
         "name",
         "number",
         "command_params",

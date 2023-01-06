@@ -22,9 +22,9 @@ def sticker_executor(
 
 
 sticker = Command(
-    "sticker",
-    "/sticker",
-    "Creates a sticker with an image that you provide.",
-    sticker_executor,
-    ["image", "_download_image", "_create_sticker", "_send_message"],
+    name="sticker",
+    parameters=[],
+    description="Creates a sticker with an image that you provide.",
+    executor=sticker_executor,
+    args=["image", "_download_image", "_create_sticker", "_send_message"],
 )

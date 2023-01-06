@@ -13,9 +13,9 @@ def say_executor(
 
 
 say = Command(
-    "say",
-    "/say _<message>_",
-    "Replies with the message you sent.",
-    say_executor,
-    ["command_params", "_send_message"],
+    name="say",
+    parameters=["message"],
+    description="Replies with the message you sent.",
+    executor=say_executor,
+    args=["command_params", "_send_message"],
 )
