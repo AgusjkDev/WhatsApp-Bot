@@ -6,8 +6,9 @@ from .sticker import sticker
 from .say import say
 from .send import send
 from .resources import resources
+from .history import history
 
 commands_dict: dict[str, list[Command]] = {
     "global": [menu, whoami, sticker, say, send],
-    "staff": [resources],
+    "staff": [resources, history],
 }

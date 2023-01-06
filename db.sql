@@ -109,4 +109,5 @@ VALUES ('menu', 'Returns a list of all the available commands.'),
 ('sticker', 'Creates a sticker with an image that you provide.'),
 ('say', 'Replies with the message you sent.'),
 ('send', 'Sends a message to a specified phone number, clarifying that it is your message.'),
-('resources', 'Returns details about CPU and RAM usage.');
+('resources', 'Returns details about CPU and RAM usage.'),
+('history', 'Returns the command history of an user, with an optional limit.');

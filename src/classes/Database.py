@@ -76,6 +76,34 @@ class Database:
 
                 return
 
+    def get_user_command_history(
+        self, number: str, limit: int
+    ) -> list[tuple[str, str]] | None:
+        with self.__get_cursor() as cursor:
+            try:
+                cursor.execute(
+                    f"SELECT command_name, execution_date FROM executed_commands WHERE number = '{number}' ORDER BY execution_date DESC LIMIT {limit};"
+                )
+                data = cursor.fetchall()
+                if not data:
+                    return
+
+                self.__connection.commit()
+
+                return [
+                    (
+                        executed_command[0],
+                        executed_command[1].strftime("%H:%M:%S, %d/%m/%Y"),
+                    )
+                    for executed_command in data
+                ]
+            except BaseException as e:
+                print_exception(e)
+
+                self.__connection.rollback()
+
+                return
+
     def register_user(self, number: str, name: str) -> None:
         with self.__get_cursor() as cursor:
             try:
