@@ -174,11 +174,11 @@ class CommandHandler:
             total_time = f"{time.time() - time_start:.2f}"
 
             self.__logger.log(
-                f"{kwargs.get('name')} ({kwargs.get('number')}) successfully executed a command in {total_time}s: {COMMAND_SYMBOL}{command_name}",
+                f"{kwargs.get('user_name')} ({kwargs.get('phone_number')}) successfully executed a command in {total_time}s: {COMMAND_SYMBOL}{command_name}",
                 "EVENT",
             )
             self._db.executed_command(
-                kwargs.get("phone_number"), kwargs.get("name"), command_name
+                kwargs.get("number"), kwargs.get("user_name"), command_name
             )
         except BaseException as e:
             self.__logger.log(

@@ -40,12 +40,10 @@ class Database:
         finally:
             cursor.close()
 
-    def is_number_banned(self, phone_number: str) -> bool | None:
+    def is_number_banned(self, number: str) -> bool | None:
         with self.__get_cursor() as cursor:
             try:
-                cursor.execute(
-                    f"SELECT * FROM banned_users WHERE phone_number = '{phone_number}';"
-                )
+                cursor.execute(f"SELECT * FROM banned_users WHERE number = '{number}';")
                 is_banned = cursor.fetchone()
 
                 self.__connection.commit()
@@ -58,15 +56,15 @@ class Database:
 
                 return
 
-    def register_user(self, phone_number: str, name: str) -> None:
+    def register_user(self, number: str, name: str) -> None:
         with self.__get_cursor() as cursor:
             try:
                 cursor.execute(
                     f"""
-                        INSERT INTO users (phone_number, user_name)
-                        SELECT '{phone_number}', '{name}'
+                        INSERT INTO users (number, user_name)
+                        SELECT '{number}', '{name}'
                         WHERE NOT EXISTS (
-                            SELECT phone_number FROM users WHERE phone_number = '{phone_number}'
+                            SELECT number FROM users WHERE number = '{number}'
                         );
                     """
                 )
@@ -79,15 +77,15 @@ class Database:
 
                 return
 
-    def executed_command(self, phone_number: str, name: str, command_name: str) -> None:
+    def executed_command(self, number: str, name: str, command_name: str) -> None:
         with self.__get_cursor() as cursor:
             try:
-                self.register_user(phone_number, name)
+                self.register_user(number, name)
 
                 cursor.execute(
                     f"""
-                        INSERT INTO executed_commands (phone_number, command_name)
-                        VALUES ('{phone_number}', '{command_name}');
+                        INSERT INTO executed_commands (number, command_name)
+                        VALUES ('{number}', '{command_name}');
                     """
                 )
 

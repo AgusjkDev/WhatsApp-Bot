@@ -1,15 +1,15 @@
 CREATE DATABASE whatsapp_bot;
 
 CREATE TABLE users (
-    phone_number VARCHAR(15) PRIMARY KEY,
+    number VARCHAR(15) PRIMARY KEY,
     user_name VARCHAR(25) NOT NULL,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE banned_users (
-    phone_number VARCHAR(15) PRIMARY KEY,
+    number VARCHAR(15) PRIMARY KEY,
     ban_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (phone_number) REFERENCES users (phone_number)
+    FOREIGN KEY (number) REFERENCES users (number)
 );
 
 CREATE TABLE roles (
@@ -19,11 +19,11 @@ CREATE TABLE roles (
 );
 
 CREATE TABLE user_roles (
-    phone_number VARCHAR(15) NOT NULL,
+    number VARCHAR(15) NOT NULL,
     role_name VARCHAR(255) NOT NULL,
     grant_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (phone_number, role_name),
-    FOREIGN KEY (phone_number) REFERENCES users (phone_number),
+    PRIMARY KEY (number, role_name),
+    FOREIGN KEY (number) REFERENCES users (number),
     FOREIGN KEY (role_name) REFERENCES roles (role_name)
 );
 
@@ -36,17 +36,17 @@ CREATE TABLE commands (
 
 CREATE TABLE executed_commands (
     id serial PRIMARY KEY,
-    phone_number VARCHAR(15) NOT NULL,
+    number VARCHAR(15) NOT NULL,
     command_name VARCHAR(15) NOT NULL,
     execution_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (phone_number) REFERENCES users (phone_number),
+    FOREIGN KEY (number) REFERENCES users (number),
     FOREIGN KEY (command_name) REFERENCES commands (command_name)
 );
 
 CREATE OR REPLACE FUNCTION add_user_role_function()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO user_roles (phone_number, role_name) VALUES (NEW.phone_number, 'USER');
+    INSERT INTO user_roles (number, role_name) VALUES (NEW.number, 'USER');
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

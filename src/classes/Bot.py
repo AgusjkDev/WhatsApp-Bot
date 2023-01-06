@@ -233,8 +233,6 @@ class Bot:
 
         attempt = 1
         while True:
-            qr_temp_file, opened_processes = None, []
-
             try:
                 self.__driver.get("https://web.whatsapp.com")
 
@@ -320,22 +318,22 @@ class Bot:
             except (NoSuchElementException, StaleElementReferenceException):
                 continue
 
-            name, number = None, None
+            user_name, phone_number = None, None
 
             try:
                 chat.click()
 
                 chat_data = self.__get_chat_data()
                 if chat_data:
-                    name, number = chat_data
-                    phone_number = normalize_phone_number(number)
+                    user_name, phone_number = chat_data
+                    number = normalize_phone_number(phone_number)
                     if not self.__db.is_number_banned(phone_number):
                         message_data = self.__get_message_data()
                         if message_data:
                             self.__command_handler.execute(
-                                name=name,
-                                number=number,
+                                user_name=user_name,
                                 phone_number=phone_number,
+                                number=number,
                                 **message_data,
                             )
 
@@ -344,7 +342,7 @@ class Bot:
 
             except StaleElementReferenceException:  # If we are here and no one has been spamming, there's something wrong.
                 self.__logger.log(
-                    f"{name if name else 'An user'}{f' ({number})' if number else ''} is probably spamming messages!",
+                    f"{user_name if user_name else 'An user'}{f' ({phone_number})' if phone_number else ''} is probably spamming messages!",
                     "ALERT",
                 )
 
