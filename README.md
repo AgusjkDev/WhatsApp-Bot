@@ -40,7 +40,7 @@
 -   /resources ✅
     -   Returns details about CPU and RAM usage.
     -   Requires **MODERATOR** role or higher.
--   /history _\<phone number>_**;**_\<limit?>_ ❌
+-   /history _\<phone number>_**;**_\<limit?>_ ✅
     -   Returns the command history of an user, with an optional limit.
     -   Requires **MODERATOR** role or higher.
 -   /executions _\<command name>_ ❌
