@@ -1,6 +1,7 @@
 import requests
 import os
 import psutil
+import time
 import subprocess
 import phonenumbers
 from bs4 import BeautifulSoup
@@ -54,18 +55,22 @@ def await_element_load(
 
 
 def open_qr(qr_image_path: str) -> list[int]:
-    # Add padding to the QR code image.
     old_qr = Image.open(qr_image_path)
     width, height = old_qr.size
+
+    # Create a new QR code image but with padding.
     new_qr = Image.new(old_qr.mode, (width + 50, height + 50), (255, 255, 255))
     new_qr.paste(old_qr, (25, 25))
+
+    processes_before_showing = [p.pid for p in psutil.process_iter()]
+    new_qr.show()
     os.remove(qr_image_path)
-    new_qr.save(qr_image_path)
 
-    before_opening = [p.pid for p in psutil.process_iter()]
-    os.system(qr_image_path)
+    time.sleep(0.25)
 
-    return [p.pid for p in psutil.process_iter() if p.pid not in before_opening]
+    return [
+        p.pid for p in psutil.process_iter() if p.pid not in processes_before_showing
+    ]
 
 
 def kill_process(*pids: int) -> None:

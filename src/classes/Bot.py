@@ -259,14 +259,17 @@ class Bot:
                 if not qr.screenshot(qr_temp_file):
                     raise QrCodeException
 
-                opened_processes = open_qr(qr_temp_file)
+                opened_qr = open_qr(qr_temp_file)
                 self.__logger.log("Awaiting QR code scan...", "DEBUG")
 
                 if not await_element_load(
                     Locators.LOGGING_IN, self.__driver, timeout=Timeouts.LOGGING_IN
                 ):
+                    kill_process(*opened_qr)
+
                     raise CouldntLogInException
 
+                kill_process(*opened_qr)
                 self.__logger.log("Scanned, logging in...", "DEBUG")
 
                 if not await_element_load(
@@ -301,13 +304,6 @@ class Bot:
                 self.error = True
 
                 return
-
-            finally:
-                if qr_temp_file:
-                    os.remove(qr_temp_file)
-
-                if opened_processes:
-                    kill_process(*opened_processes)
 
     def handle_messages(self) -> None:
         self.__logger.log("Handling messages...", "DEBUG")
