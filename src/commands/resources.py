@@ -27,7 +27,7 @@ resources = Command(
     name="resources",
     parameters=[],
     description="Returns details about CPU and RAM usage.",
-    roles=[Roles.MODERATOR, Roles.ADMIN],
+    roles=Roles.STAFF,
     executor=resources_executor,
     args=["_send_message"],
 )
