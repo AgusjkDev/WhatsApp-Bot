@@ -2,6 +2,7 @@ import os
 from typing import Callable, Optional
 
 from classes.Command import Command
+from enums import Roles
 
 
 def sticker_executor(
@@ -25,6 +26,7 @@ sticker = Command(
     name="sticker",
     parameters=[],
     description="Creates a sticker with an image that you provide.",
+    roles=Roles.ALL_ROLES,
     executor=sticker_executor,
     args=["image", "_download_image", "_create_sticker", "_send_message"],
 )

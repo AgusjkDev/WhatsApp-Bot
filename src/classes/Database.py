@@ -56,6 +56,26 @@ class Database:
 
                 return
 
+    def get_user_role(self, number: str) -> str | None:
+        with self.__get_cursor() as cursor:
+            try:
+                cursor.execute(
+                    f"SELECT role_name FROM user_roles WHERE number = '{number}';"
+                )
+                data = cursor.fetchone()
+                if not data:
+                    return
+
+                self.__connection.commit()
+
+                return data[0]
+            except BaseException as e:
+                print_exception(e)
+
+                self.__connection.rollback()
+
+                return
+
     def register_user(self, number: str, name: str) -> None:
         with self.__get_cursor() as cursor:
             try:

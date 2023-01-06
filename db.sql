@@ -108,4 +108,5 @@ VALUES ('menu', 'Returns a list of all the available commands.'),
 ('whoami', 'Tells you who you are.'),
 ('sticker', 'Creates a sticker with an image that you provide.'),
 ('say', 'Replies with the message you sent.'),
-('send', 'Sends a message to a specified phone number, clarifying that it is your message.');
+('send', 'Sends a message to a specified phone number, clarifying that it is your message.'),
+('resources', 'Returns details about CPU and RAM usage.');

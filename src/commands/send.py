@@ -4,6 +4,7 @@ from typing import Callable, Optional
 from classes.Database import Database
 from classes.Command import Command
 from utils import is_valid_phone_number, normalize_phone_number
+from enums import Roles
 
 
 def send_executor(
@@ -42,6 +43,7 @@ send = Command(
     name="send",
     parameters=["phone number", "message"],
     description="Sends a message to a specified phone number, clarifying that it is your message.",
+    roles=Roles.ALL_ROLES,
     executor=send_executor,
     args=[
         "user_name",

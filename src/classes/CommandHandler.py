@@ -9,9 +9,9 @@ from selenium.common.exceptions import NoSuchElementException
 from .Logger import Logger
 from .Database import Database
 from .Command import Command
-from commands import commands
+from commands import commands_dict
 from utils import await_element_load
-from enums import Locators, Timeouts
+from enums import Locators, Timeouts, Roles
 from exceptions import CouldntHandleCommandException
 from constants import COMMAND_SYMBOL
 
@@ -25,19 +25,20 @@ class CommandHandler:
 
     # Protected values
     _db: Database
-    _commands: list[Command]
+    _commands: dict[str, list[Command]]
 
     def __init__(self, driver: Chrome, logger: Logger, db: Database) -> None:
         self.__driver = driver
         self.__logger = logger
         self._db = db
-        self._commands = []
+        self._commands = commands_dict
 
-        for command in commands:
-            self.__logger.log(
-                f"Registering command: {COMMAND_SYMBOL}{command.name}...", "DEBUG"
-            )
-            self._commands.append(command)
+        for commands_type, commands in self._commands.items():
+            for command in commands:
+                self.__logger.log(
+                    f"Registering {commands_type} command: {COMMAND_SYMBOL}{command.name}...",
+                    "DEBUG",
+                )
 
     def _send_message(self, message: str, sent_by_user: bool = False) -> None:
         input_box = self.__driver.find_element(*Locators.INPUT_BOX)
@@ -134,7 +135,10 @@ class CommandHandler:
         return True
 
     def execute(self, **kwargs) -> None:
-        message = kwargs.get("message")
+        user_name, phone_number, number, message = [
+            kwargs.get(key)
+            for key in ["user_name", "phone_number", "number", "message"]
+        ]
 
         if not message.startswith(COMMAND_SYMBOL):
             return
@@ -147,7 +151,11 @@ class CommandHandler:
             pass
 
         matched_commands = [
-            command for command in self._commands if command_name == command.name
+            command
+            for command in [
+                command for commands in self._commands.values() for command in commands
+            ]
+            if command_name == command.name
         ]
         if not matched_commands:
             return self._send_message(
@@ -155,6 +163,13 @@ class CommandHandler:
             )
 
         command = matched_commands[0]
+
+        user_role = self._db.get_user_role(number)
+        user_role = user_role if user_role else Roles.DEFAULT
+        if user_role not in command.roles:
+            return self._send_message("```You don't have enough permissions!```")
+
+        kwargs["user_role"] = user_role
 
         try:
             time_start = time.time()
@@ -174,12 +189,10 @@ class CommandHandler:
             total_time = f"{time.time() - time_start:.2f}"
 
             self.__logger.log(
-                f"{kwargs.get('user_name')} ({kwargs.get('phone_number')}) successfully executed a command in {total_time}s: {COMMAND_SYMBOL}{command_name}",
+                f"{user_name} ({phone_number}) successfully executed a command in {total_time}s: {COMMAND_SYMBOL}{command_name}",
                 "EVENT",
             )
-            self._db.executed_command(
-                kwargs.get("number"), kwargs.get("user_name"), command_name
-            )
+            self._db.executed_command(number, user_name, command_name)
         except BaseException as e:
             self.__logger.log(
                 f"There was an error handling a command: {COMMAND_SYMBOL}{command_name}",

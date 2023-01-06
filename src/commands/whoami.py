@@ -1,6 +1,7 @@
 from typing import Callable, Optional
 
 from classes.Command import Command
+from enums import Roles
 
 
 def whoami_executor(
@@ -15,6 +16,7 @@ whoami = Command(
     name="whoami",
     parameters=[],
     description="Tells you who you are.",
+    roles=Roles.ALL_ROLES,
     executor=whoami_executor,
     args=["user_name", "phone_number", "_send_message"],
 )

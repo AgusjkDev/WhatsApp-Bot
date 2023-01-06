@@ -7,7 +7,7 @@
 -   Create a command handler with:
     -   Image handling: ✅
     -   Argument handling: ✅
-    -   Role handling: ❌
+    -   Role handling: ✅
 -   Save in the DB:
     -   Users: ✅
     -   Banned Users: ✅
@@ -22,7 +22,7 @@
     -   French: ❌
     -   German: ❌
 
-**Commands:**
+**Global commands:**
 
 -   /menu ✅
     -   Returns a list of all the available commands.
@@ -35,9 +35,9 @@
 -   /send _\<phone number>_**;**_\<message>_ ✅
     -   Sends a message to a specified phone number, clarifying that it is your message.
 
-**Commands by role:**
+**Staff commands:**
 
--   /resources ❌
+-   /resources ✅
     -   Returns details about CPU and RAM usage.
     -   Requires **MODERATOR** role or higher.
 -   /history _\<phone number>_**;**_\<limit?>_ ❌
