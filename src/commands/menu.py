@@ -1,9 +1,11 @@
-from typing import Callable
+from typing import Callable, Optional
 
 from classes.Command import Command
 
 
-def menu_executor(commands: list[Command], send_message: Callable[[str], None]) -> None:
+def menu_executor(
+    commands: list[Command], send_message: Callable[[str, Optional[bool]], None]
+) -> None:
     lines = ["```Available commands```:\n"]
 
     for command in commands:

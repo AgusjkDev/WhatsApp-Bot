@@ -1,15 +1,14 @@
 import os
-from typing import Callable
+from typing import Callable, Optional
 
 from classes.Command import Command
-from exceptions import CouldntHandleCommandException
 
 
 def sticker_executor(
     image: str | None,
     download_image: Callable[[str], str | None],
     create_sticker: Callable[[str], None],
-    send_message: Callable[[str], None],
+    send_message: Callable[[str, Optional[bool]], None],
 ) -> None:
     if not image:
         return send_message("```You need to provide an image!```")

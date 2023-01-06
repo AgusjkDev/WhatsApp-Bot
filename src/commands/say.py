@@ -1,15 +1,15 @@
-from typing import Callable
+from typing import Callable, Optional
 
 from classes.Command import Command
 
 
 def say_executor(
-    command_params: list[str], send_message: Callable[[str], None]
+    command_params: list[str], send_message: Callable[[str, Optional[bool]], None]
 ) -> None:
     if not command_params:
         return send_message("```You need to provide a message!```")
 
-    send_message(";".join(command_params))
+    send_message(";".join(command_params), sent_by_user=True)
 
 
 say = Command(

@@ -41,18 +41,38 @@ class CommandHandler:
             )
             self._commands.append(command)
 
-    def _send_message(self, message: str) -> None:
+    def _send_message(self, message: str, sent_by_user: bool = False) -> None:
         input_box = self.__driver.find_element(*Locators.INPUT_BOX)
 
-        lines = message.split("\n")
-        lines_length = len(lines)
-        for index, line in enumerate(lines, start=1):
-            input_box.send_keys(line)
+        if not sent_by_user:
+            lines = message.split("\n")
+            lines_length = len(lines)
+            for index, line in enumerate(lines, start=1):
+                input_box.send_keys(line)
 
-            if index != lines_length:
-                ActionChains(self.__driver).key_down(Keys.SHIFT).send_keys(
-                    Keys.ENTER
-                ).key_up(Keys.SHIFT).perform()
+                if index != lines_length:
+                    ActionChains(self.__driver).key_down(Keys.SHIFT).send_keys(
+                        Keys.ENTER
+                    ).key_up(Keys.SHIFT).perform()
+        else:
+            # If we don't type anything, the input box text element won't exist.
+            input_box.send_keys(" ")
+            input_box_text = input_box.find_element(*Locators.INPUT_BOX_TEXT)
+
+            self.__driver.execute_script(
+                """
+                    const [element, text] = arguments;
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.setData("text", text);
+                    const event = new ClipboardEvent("paste", {
+                        clipboardData: dataTransfer,
+                        bubbles: true
+                    });
+                    element.dispatchEvent(event)
+                """,
+                input_box_text,
+                message,
+            )
 
         input_box.send_keys(Keys.ENTER)
 
