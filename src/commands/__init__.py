@@ -7,8 +7,9 @@ from .say import say
 from .send import send
 from .resources import resources
 from .history import history
+from .executions import executions
 
 commands_dict: dict[str, list[Command]] = {
     "global": [menu, whoami, sticker, say, send],
-    "staff": [resources, history],
+    "staff": [resources, history, executions],
 }

@@ -43,7 +43,7 @@
 -   /history _\<phone number>_**;**_\<limit?>_ ✅
     -   Returns the command history of an user, with an optional limit.
     -   Requires **MODERATOR** role or higher.
--   /executions _\<command name>_ ❌
+-   /executions _\<command name>_ ✅
     -   Returns the number of times a command has been executed.
     -   Requires **MODERATOR** role or higher.
 -   /pfp _(with an image)_ ❌
