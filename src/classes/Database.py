@@ -1,9 +1,11 @@
 import psycopg2
 from psycopg2.errors import ForeignKeyViolation
 from contextlib import contextmanager
+from datetime import datetime
 from typing import Any
 
 from .Logger import Logger
+from utils import format_date
 from constants import DB_CONFIG
 
 from traceback import print_exception  # Only for development purposes
@@ -102,10 +104,7 @@ class Database:
                 self.__connection.commit()
 
                 return [
-                    (
-                        executed_command[0],
-                        executed_command[1].strftime("%H:%M:%S, %d/%m/%Y"),
-                    )
+                    (executed_command[0], format_date(executed_command[1]))
                     for executed_command in data
                 ]
             except BaseException as e:

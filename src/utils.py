@@ -11,6 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from PIL import Image
+from datetime import datetime
 
 from constants import BRAVE_PATH
 
@@ -91,3 +92,7 @@ def is_valid_phone_number(phone_number: str) -> bool:
         return phonenumbers.is_valid_number(phonenumbers.parse(phone_number))
     except phonenumbers.NumberParseException:
         return False
+
+
+def format_date(date: datetime) -> str:
+    return date.strftime("%H:%M:%S, %d/%m/%Y")
