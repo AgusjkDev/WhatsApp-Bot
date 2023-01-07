@@ -19,7 +19,7 @@ class Command:
         description: str,
         roles: list[Roles],
         executor: Callable[..., None],
-        args: list[str] | None = None,
+        args: list[str],
     ) -> None:
         self.name = name
         self.parameters = parameters

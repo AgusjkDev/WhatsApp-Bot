@@ -174,23 +174,18 @@ class CommandHandler:
 
         try:
             time_start = time.time()
-
-            if command.args:
-                command.executor(
-                    *[
-                        self.__getattribute__(arg)
-                        if arg.startswith("_")
-                        else kwargs.get(arg)
-                        for arg in command.args
-                    ]
-                )
-            else:
-                command.executor()
-
+            command.executor(
+                *[
+                    self.__getattribute__(arg)
+                    if arg.startswith("_")
+                    else kwargs.get(arg)
+                    for arg in command.args
+                ]
+            )
             total_time = f"{time.time() - time_start:.2f}"
 
             self.__logger.log(
-                f"{user_name} ({phone_number}) successfully executed a command in {total_time}s: {COMMAND_SYMBOL}{command_name}",
+                f"{user_name} ({phone_number}) executed a command in {total_time}s: {COMMAND_SYMBOL}{command_name}",
                 "EVENT",
             )
             self._db.executed_command(number, user_name, command_name)
