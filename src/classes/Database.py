@@ -175,6 +175,25 @@ class Database:
 
                 self.__connection.rollback()
 
+    def set_user_role(self, number: str, role_name: str) -> bool | None:
+        with self.__get_cursor() as cursor:
+            try:
+                cursor.execute(
+                    f"""
+                        UPDATE user_roles
+                        SET role_name = '{role_name}'
+                        WHERE number = '{number}';
+                    """
+                )
+
+                self.__connection.commit()
+
+                return bool(cursor.rowcount)
+            except BaseException as e:
+                print_exception(e)
+
+                self.__connection.rollback()
+
     def register_user(self, number: str, user_name: str) -> None:
         with self.__get_cursor() as cursor:
             try:

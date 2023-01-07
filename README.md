@@ -48,16 +48,16 @@
     -   Requires **MODERATOR** role or higher.
 -   /pfp _(with an image)_ ❌
     -   Sets the given image as profile picture.
-    -   Requires **ADMIN** role.
+    -   Requires **ADMIN** role or higher.
 -   /status _\<message>_ ❌
     -   Sets the given message as profile status.
-    -   Requires **ADMIN** role.
+    -   Requires **ADMIN** role or higher.
 -   /ban _\<phone number>_**;**_\<reason>_ ✅
     -   Bans the given phone number due to a reason.
-    -   Requires **ADMIN** role.
+    -   Requires **ADMIN** role or higher.
 -   /unban _\<phone number>_ ✅
     -   Unbans the given phone number.
-    -   Requires **ADMIN** role.
--   /role _\<phone number>_**;**_\<role>_ ❌
+    -   Requires **ADMIN** role or higher.
+-   /role _\<phone number>_**;**_\<role name>_ ✅
     -   Sets a role for a given phone number.
-    -   Requires **ADMIN** role.
+    -   Requires **OWNER** role.
