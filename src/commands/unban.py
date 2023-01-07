@@ -38,7 +38,7 @@ unban = Command(
     name="unban",
     parameters=["phone number"],
     description="Unbans the given phone number.",
-    roles=[Roles.ADMIN],
+    roles=[Roles.ADMIN, Roles.OWNER],
     executor=unban_executor,
     args=["command_params", "_db", "_send_message"],
 )

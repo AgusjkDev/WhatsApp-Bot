@@ -46,7 +46,7 @@ ban = Command(
     name="ban",
     parameters=["phone number", "reason"],
     description="Bans the given phone number due to a reason.",
-    roles=[Roles.ADMIN],
+    roles=[Roles.ADMIN, Roles.OWNER],
     executor=ban_executor,
     args=["command_params", "number", "_db", "_send_message"],
 )
