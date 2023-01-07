@@ -103,10 +103,7 @@ class Database:
 
                 self.__connection.commit()
 
-                return [
-                    (executed_command[0], format_date(executed_command[1]))
-                    for executed_command in data
-                ]
+                return [(col[0], format_date(col[1])) for col in data]
             except BaseException as e:
                 print_exception(e)
 
