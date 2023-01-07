@@ -14,10 +14,10 @@ def resources_executor(send_message: Callable[[str, Optional[bool]], None]) -> N
     ram_usage = f"{ram.percent}%"
 
     lines = [
-        "```Host resources usage:```\n",
-        f"*CPU Usage*: {cpu_usage}",
-        f"*RAM*: {used_ram}/{total_ram} GB",
-        f"*RAM Usage*: {ram_usage}",
+        "*Host resources usage*:\n",
+        f"*CPU Usage*: _{cpu_usage}_",
+        f"*RAM*: _{used_ram}/{total_ram} GB_",
+        f"*RAM Usage*: _{ram_usage}_",
     ]
 
     send_message("\n".join(lines))

@@ -12,11 +12,11 @@ def sticker_executor(
     send_message: Callable[[str, Optional[bool]], None],
 ) -> None:
     if not image:
-        return send_message("```You need to provide an image!```")
+        return send_message("*You need to provide an image!*")
 
     image_path = download_image(image)
     if not image_path:
-        return send_message("```We couldn't download your image!```\n\nTry again...")
+        return send_message("*We couldn't download your image!*\n\n_Try again..._")
 
     create_sticker(image_path)
     os.remove(image_path)

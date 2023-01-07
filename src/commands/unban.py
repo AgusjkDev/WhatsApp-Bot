@@ -12,14 +12,14 @@ def unban_executor(
     send_message: Callable[[str, Optional[bool]], None],
 ) -> None:
     if not command_params:
-        return send_message("```You need to provide a phone number!```")
+        return send_message("*You need to provide a phone number!*")
 
     phone_number = command_params[0]
     normalized_phone_number = normalize_phone_number(phone_number)
 
     if not db.unban_user(normalized_phone_number):
         return send_message(
-            f"There was an error trying to ban *{phone_number}*.\n\nTry again..."
+            f"*There was an error trying to ban {phone_number}*!\n\n_Try again..."
         )
 
     send_message(f"*{phone_number}* has been unbanned.")

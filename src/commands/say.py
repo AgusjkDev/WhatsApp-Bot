@@ -8,7 +8,7 @@ def say_executor(
     command_params: list[str], send_message: Callable[[str, Optional[bool]], None]
 ) -> None:
     if not command_params:
-        return send_message("```You need to provide a message!```")
+        return send_message("*You need to provide a message!*")
 
     send_message(";".join(command_params), sent_by_user=True)
 

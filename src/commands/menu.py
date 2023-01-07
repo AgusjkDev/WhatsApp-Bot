@@ -17,15 +17,15 @@ def menu_executor(
             else None
         )
 
-        return f"*{COMMAND_SYMBOL}{command.name}*{f' {parameters}' if parameters else ''}: _{command.description}_"
+        return f"*{COMMAND_SYMBOL}{command.name}*{f' {parameters}' if parameters else ''}: {command.description}"
 
-    lines = ["```Global commands```:\n"] + [
+    lines = ["Global Commands:\n"] + [
         format_command(command) for command in commands["global"]
     ]
 
     if user_role in Roles.STAFF:
         lines.extend(
-            ["\n```Staff commands```:\n"]
+            ["\nStaff Commands:\n"]
             + [format_command(command) for command in commands["staff"]]
         )
 

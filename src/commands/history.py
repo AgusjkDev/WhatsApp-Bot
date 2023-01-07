@@ -15,7 +15,7 @@ def history_executor(
     send_message: Callable[[str, Optional[bool]], None],
 ) -> None:
     if not command_params:
-        return send_message("```You need to provide a phone number!```")
+        return send_message("*You need to provide a phone number!*")
 
     phone_number = command_params[0]
     normalized_phone_number = normalize_phone_number(phone_number)
@@ -23,7 +23,7 @@ def history_executor(
     try:
         limit = int(command_params[1]) if len(command_params) > 1 else HISTORY_LIMIT
     except ValueError:
-        return send_message("```The limit must be a number!```")
+        return send_message("*The limit must be an integer number!*")
 
     command_history = db.get_user_command_history(normalized_phone_number, limit)
     if not command_history:
