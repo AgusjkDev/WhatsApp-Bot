@@ -327,7 +327,7 @@ class Bot:
                 if chat_data:
                     user_name, phone_number = chat_data
                     number = normalize_phone_number(phone_number)
-                    if not self.__db.is_number_banned(phone_number):
+                    if not self.__db.is_user_banned(number):
                         message_data = self.__get_message_data()
                         if message_data:
                             self.__command_handler.execute(

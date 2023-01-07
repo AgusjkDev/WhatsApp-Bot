@@ -40,7 +40,7 @@ class Database:
         finally:
             cursor.close()
 
-    def is_number_banned(self, number: str) -> bool | None:
+    def is_user_banned(self, number: str) -> bool | None:
         with self.__get_cursor() as cursor:
             try:
                 cursor.execute(f"SELECT * FROM banned_users WHERE number = '{number}';")
