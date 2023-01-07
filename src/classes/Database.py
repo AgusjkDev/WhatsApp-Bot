@@ -190,6 +190,36 @@ class Database:
 
                 self.__connection.rollback()
 
+    def get_user_information(self, number: str) -> list[str | int | bool] | list | None:
+        with self.__get_cursor() as cursor:
+            try:
+                cursor.execute(
+                    f"""
+                        SELECT u.user_name, u.creation_date, ur.role_name, ur.grant_date, COUNT(ec.command_name) as executed_commands,
+                        CASE WHEN bu.number IS NOT NULL THEN TRUE ELSE FALSE END as is_banned
+                        FROM users u
+                        INNER JOIN user_roles ur ON u.number = ur.number
+                        INNER JOIN executed_commands ec ON u.number = ec.number
+                        LEFT JOIN banned_users bu ON u.number = bu.number
+                        WHERE u.number = '{number}'
+                        GROUP BY u.user_name, u.creation_date, ur.role_name, ur.grant_date, bu.number
+                        LIMIT 1;
+                    """
+                )
+                data = cursor.fetchone()
+                if not data:
+                    return []
+
+                self.__connection.commit()
+
+                return [
+                    col if type(col) != datetime else format_date(col) for col in data
+                ]
+            except BaseException as e:
+                print_exception(e)
+
+                self.__connection.rollback()
+
     def register_user(self, number: str, user_name: str) -> None:
         with self.__get_cursor() as cursor:
             try:

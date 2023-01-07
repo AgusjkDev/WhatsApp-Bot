@@ -130,4 +130,5 @@ VALUES ('menu', 'Returns a list of all the available commands.'),
 ('executions', 'Returns the number of times a command has been executed.'),
 ('ban', 'Bans the given phone number due to a reason.'),
 ('unban', 'Unbans the given phone number.'),
-('role', 'Sets a role for a given phone number.');
+('role', 'Sets a role for a given phone number.'),
+('user', 'Returns information about an user.');

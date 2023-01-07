@@ -11,8 +11,9 @@ from .executions import executions
 from .ban import ban
 from .unban import unban
 from .role import role
+from .user import user
 
 commands_dict: dict[str, list[Command]] = {
     "global": [menu, whoami, sticker, say, send],
-    "staff": [resources, history, executions, ban, unban, role],
+    "staff": [resources, history, executions, ban, unban, role, user],
 }

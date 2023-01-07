@@ -46,6 +46,9 @@
 -   /executions _\<command name>_ ✅
     -   Returns the number of times a command has been executed.
     -   Requires **MODERATOR** role or higher.
+-   /user _\<phone number>_ ✅
+    -   Returns information about an user.
+    -   Requires **MODERATOR** role or higher.
 -   /pfp _(with an image)_ ❌
     -   Sets the given image as profile picture.
     -   Requires **ADMIN** role or higher.
