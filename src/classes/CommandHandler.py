@@ -148,7 +148,7 @@ class CommandHandler:
         try:
             kwargs["command_params"] = message[message.index(" ") + 1 :].split(";")
         except ValueError:
-            pass
+            kwargs["command_params"] = []
 
         matched_commands = [
             command
