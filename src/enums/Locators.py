@@ -29,6 +29,10 @@ class Locators:
         './div[not(contains(@data-testid, "poll-bubble"))]/div[1]/div/span[1]/span',
     )
     EMOJIS = (By.XPATH, "//img[@data-plain-text]")
+    DOWNLOAD_IMAGE_CONTAINER = (
+        By.XPATH,
+        './div[@data-testid="media-state-download"]/..',
+    )
     IMAGE_WITH_TEXT_CONTAINER = (
         By.XPATH,
         './div[1]/div/div[@data-testid="image-thumb"]/../div[2]/div/span[1]/span/../../../../div[@data-testid="image-thumb"]',

@@ -207,6 +207,13 @@ class Bot:
                     *Locators.IMAGE_WITH_TEXT_CONTAINER
                 )
 
+                try:
+                    image_with_text_container.find_element(
+                        *Locators.DOWNLOAD_IMAGE_CONTAINER
+                    ).click()
+                except NoSuchElementException:
+                    pass
+
                 if not await_element_load(
                     Locators.IMAGE_WITH_TEXT,
                     image_with_text_container,
