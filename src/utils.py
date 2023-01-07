@@ -67,7 +67,7 @@ def open_qr(qr_image_path: str) -> list[int]:
     new_qr.show()
     os.remove(qr_image_path)
 
-    time.sleep(0.25)
+    time.sleep(0.5)
 
     return [
         p.pid for p in psutil.process_iter() if p.pid not in processes_before_showing
