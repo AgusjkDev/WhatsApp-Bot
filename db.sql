@@ -102,7 +102,7 @@ EXECUTE PROCEDURE add_executed_command();
 ----------------------------------------
 
 INSERT INTO roles (role_name)
-VALUES ('USER'), ('MODERATOR'), ('ADMIN');
+VALUES ('USER'), ('MODERATOR'), ('ADMIN'), ('OWNER');
 
 INSERT INTO commands (command_name, command_description)
 VALUES ('menu', 'Returns a list of all the available commands.'),
