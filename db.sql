@@ -113,4 +113,5 @@ VALUES ('menu', 'Returns a list of all the available commands.'),
 ('resources', 'Returns details about CPU and RAM usage.'),
 ('history', 'Returns the command history of an user, with an optional limit.'),
 ('executions', 'Returns the number of times a command has been executed.'),
-('ban', 'Bans the given phone number due to a reason.');
+('ban', 'Bans the given phone number due to a reason.'),
+('unban', 'Unbans the given phone number.');

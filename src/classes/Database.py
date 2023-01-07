@@ -147,6 +147,26 @@ class Database:
 
                 return
 
+    def unban_user(self, number: str) -> bool | None:
+        with self.__get_cursor() as cursor:
+            try:
+                cursor.execute(
+                    f"""
+                        DELETE FROM banned_users
+                        WHERE number = '{number}';
+                    """
+                )
+
+                self.__connection.commit()
+
+                return True
+            except BaseException as e:
+                print_exception(e)
+
+                self.__connection.rollback()
+
+                return False
+
     def register_user(self, number: str, name: str) -> None:
         with self.__get_cursor() as cursor:
             try:

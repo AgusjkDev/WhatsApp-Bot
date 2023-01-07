@@ -9,8 +9,9 @@ from .resources import resources
 from .history import history
 from .executions import executions
 from .ban import ban
+from .unban import unban
 
 commands_dict: dict[str, list[Command]] = {
     "global": [menu, whoami, sticker, say, send],
-    "staff": [resources, history, executions, ban],
+    "staff": [resources, history, executions, ban, unban],
 }
