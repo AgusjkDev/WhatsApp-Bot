@@ -79,6 +79,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION update_grant_date_on_update_function()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF OLD.role_name != NEW.role_name THEN
+        UPDATE user_roles SET grant_date = CURRENT_TIMESTAMP WHERE number = NEW.number AND role_name = NEW.role_name;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TRIGGER add_user_role
 AFTER INSERT ON users
 FOR EACH ROW
@@ -98,6 +108,11 @@ CREATE TRIGGER add_executed_command
 AFTER INSERT ON executed_commands
 FOR EACH ROW
 EXECUTE PROCEDURE add_executed_command();
+
+CREATE TRIGGER update_grant_date_on_update
+AFTER UPDATE ON user_roles
+FOR EACH ROW
+EXECUTE PROCEDURE update_grant_date_on_update_function();
 
 ----------------------------------------
 
