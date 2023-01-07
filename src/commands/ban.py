@@ -21,19 +21,19 @@ def ban_executor(
     if normalized_phone_number == number:
         return send_message("*You can't ban yourself!*")
 
-    if db.is_user_banned(normalized_phone_number):
+    is_already_banned = db.is_user_banned(normalized_phone_number)
+    if is_already_banned:
         return send_message(f"*{phone_number}* was already banned.")
 
-    banned = db.ban_user(normalized_phone_number, reason)
-    if banned is None:
-        return send_message(
-            "*There was an error trying to ban that user!*\n\n_Try again..._"
-        )
+    if is_already_banned == False:
+        banned = db.ban_user(normalized_phone_number, reason)
+        if banned == False:
+            return send_message("*Unknown user!*")
 
-    if not banned:
-        return send_message("*Unknown user!*")
+        if banned:
+            return send_message(f"*{phone_number}* has been permanently banned.")
 
-    send_message(f"*{phone_number}* has been permanently banned.")
+    send_message("*There was an error trying to ban that user!*\n\n_Try again..._")
 
 
 ban = Command(

@@ -17,12 +17,16 @@ def unban_executor(
     phone_number = command_params[0]
     normalized_phone_number = normalize_phone_number(phone_number)
 
-    if not db.unban_user(normalized_phone_number):
+    is_unbanned = db.unban_user(normalized_phone_number)
+    if is_unbanned == None:
         return send_message(
-            f"*There was an error trying to ban {phone_number}*!\n\n_Try again..."
+            f"*There was an error trying to unban {phone_number}*!\n\n_Try again..._"
         )
 
-    send_message(f"*{phone_number}* has been unbanned.")
+    if is_unbanned:
+        return send_message(f"*{phone_number}* has been unbanned.")
+
+    send_message(f"*{phone_number}* was not banned.")
 
 
 unban = Command(
