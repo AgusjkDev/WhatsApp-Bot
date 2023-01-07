@@ -52,8 +52,11 @@
 -   /status _\<message>_ ❌
     -   Sets the given message as profile status.
     -   Requires **ADMIN** role.
--   /ban _\<phone number>_**;**_\<reason>_ ❌
+-   /ban _\<phone number>_**;**_\<reason>_ ✅
     -   Bans the given phone number due to a reason.
+    -   Requires **ADMIN** role.
+-   /unban _\<phone number>_ ✅
+    -   Unbans the given phone number.
     -   Requires **ADMIN** role.
 -   /role _\<phone number>_**;**_\<role>_ ❌
     -   Sets a role for a given phone number.
