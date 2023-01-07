@@ -8,6 +8,7 @@ CREATE TABLE users (
 
 CREATE TABLE banned_users (
     number VARCHAR(15) PRIMARY KEY,
+    reason VARCHAR(255) NOT NULL,
     ban_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (number) REFERENCES users (number)
 );
@@ -111,4 +112,5 @@ VALUES ('menu', 'Returns a list of all the available commands.'),
 ('send', 'Sends a message to a specified phone number, clarifying that it is your message.'),
 ('resources', 'Returns details about CPU and RAM usage.'),
 ('history', 'Returns the command history of an user, with an optional limit.'),
-('executions', 'Returns the number of times a command has been executed.');
+('executions', 'Returns the number of times a command has been executed.'),
+('ban', 'Bans the given phone number due to a reason.');

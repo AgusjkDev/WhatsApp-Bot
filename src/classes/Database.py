@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2.errors import ForeignKeyViolation
 from contextlib import contextmanager
 from typing import Any
 
@@ -117,6 +118,28 @@ class Database:
                 self.__connection.commit()
 
                 return data[0]
+            except BaseException as e:
+                print_exception(e)
+
+                self.__connection.rollback()
+
+                return
+
+    def ban_user(self, number: str, reason: str) -> bool | None:
+        with self.__get_cursor() as cursor:
+            try:
+                cursor.execute(
+                    f"""
+                        INSERT INTO banned_users (number, reason)
+                        VALUES ('{number}', '{reason}');
+                    """
+                )
+
+                self.__connection.commit()
+
+                return True
+            except ForeignKeyViolation:
+                return False
             except BaseException as e:
                 print_exception(e)
 
