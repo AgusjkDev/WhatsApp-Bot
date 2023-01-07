@@ -18,16 +18,17 @@ def send_executor(
     if not command_params or len(command_params) < 2:
         return send_message("*You need to provide phone number and message!*")
 
-    to_phone_number, message = command_params[:2]
-    normalized_to_phone_number = normalize_phone_number(phone_number)
-
-    if db.is_user_banned(normalized_to_phone_number):
-        return send_message("*This phone number is banned.*")
-
+    to_phone_number = command_params[0]
     if not is_valid_phone_number(to_phone_number):
         return send_message(
             "*Invalid phone number!*\n\n_Copy the phone number from the user's WhatsApp profile._"
         )
+
+    normalized_to_phone_number = normalize_phone_number(phone_number)
+    message = command_params[1]
+
+    if db.is_user_banned(normalized_to_phone_number):
+        return send_message("*This phone number is banned.*")
 
     send_message("_Sending message..._")
     time.sleep(1)

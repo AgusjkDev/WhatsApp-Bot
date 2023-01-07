@@ -2,7 +2,7 @@ from typing import Callable, Optional
 
 from classes.Database import Database
 from classes.Command import Command
-from utils import normalize_phone_number
+from utils import is_valid_phone_number, normalize_phone_number
 from enums import Roles
 from constants import COMMAND_SYMBOL
 
@@ -18,6 +18,11 @@ def history_executor(
         return send_message("*You need to provide a phone number!*")
 
     phone_number = command_params[0]
+    if not is_valid_phone_number(phone_number):
+        return send_message(
+            "*Invalid phone number!*\n\n_Copy the phone number from the user's WhatsApp profile._"
+        )
+
     normalized_phone_number = normalize_phone_number(phone_number)
 
     try:

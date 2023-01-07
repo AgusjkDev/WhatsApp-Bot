@@ -2,7 +2,7 @@ from typing import Callable, Optional
 
 from classes.Database import Database
 from classes.Command import Command
-from utils import normalize_phone_number
+from utils import is_valid_phone_number, normalize_phone_number
 from enums import Roles
 
 
@@ -15,8 +15,14 @@ def ban_executor(
     if not command_params or len(command_params) < 2:
         return send_message("*You need to provide a phone number and a reason!*")
 
-    phone_number, reason = command_params[:2]
+    phone_number = command_params[0]
+    if not is_valid_phone_number(phone_number):
+        return send_message(
+            "*Invalid phone number!*\n\n_Copy the phone number from the user's WhatsApp profile._"
+        )
+
     normalized_phone_number = normalize_phone_number(phone_number)
+    reason = command_params[1]
 
     if normalized_phone_number == number:
         return send_message("*You can't ban yourself!*")
