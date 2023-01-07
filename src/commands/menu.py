@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable
 
 from classes.Command import Command
 from enums import Roles
@@ -8,7 +8,7 @@ from constants import COMMAND_SYMBOL
 def menu_executor(
     user_role: str,
     commands: dict[str, list[Command]],
-    send_message: Callable[[str, Optional[bool]], None],
+    send_message: Callable[[str], None],
 ) -> None:
     def format_command(command: Command) -> str:
         parameters = (

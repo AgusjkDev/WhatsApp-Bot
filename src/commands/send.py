@@ -1,5 +1,5 @@
 import time
-from typing import Callable, Optional
+from typing import Callable
 
 from classes.Database import Database
 from classes.Command import Command
@@ -13,7 +13,7 @@ def send_executor(
     command_params: list[str],
     db: Database,
     go_to_chat: Callable[[str], bool],
-    send_message: Callable[[str, Optional[bool]], None],
+    send_message: Callable[[str], None],
 ) -> None:
     if not command_params or len(command_params) < 2:
         return send_message("*You need to provide phone number and message!*")
@@ -35,10 +35,7 @@ def send_executor(
 
     inside_chat = go_to_chat(normalized_to_phone_number)
     if inside_chat:
-        send_message(
-            f"{message}\n\n_Sent by: *{user_name}* ({phone_number})._",
-            sent_by_user=True,
-        )
+        send_message(f"{message}\n\n_Sent by: *{user_name}* ({phone_number})._")
 
 
 send = Command(

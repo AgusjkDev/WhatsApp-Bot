@@ -39,7 +39,10 @@ class Locators:
     )
     IMAGE_WITH_TEXT = (By.XPATH, './div/div/img[@alt and contains(@src, "blob")]')
     INPUT_BOX = (By.XPATH, '//div[@data-testid="conversation-compose-box-input"]')
-    INPUT_BOX_TEXT = (By.XPATH, "./p/span")
+    INPUT_BOX_TEXT = (
+        By.XPATH,
+        '//div[@data-testid="conversation-compose-box-input"]/p/span',
+    )
     EMOJI_MENU = (By.XPATH, '//button[@data-testid="compose-btn-emoji"]')
     FILE_INPUT = (By.XPATH, '//input[@type="file"]')
     SEND_BUTTON = (By.XPATH, '//span[@data-testid="send"]/..')

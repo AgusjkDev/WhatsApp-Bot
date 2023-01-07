@@ -1,11 +1,11 @@
 import psutil
-from typing import Callable, Optional
+from typing import Callable
 
 from classes.Command import Command
 from enums import Roles
 
 
-def resources_executor(send_message: Callable[[str, Optional[bool]], None]) -> None:
+def resources_executor(send_message: Callable[[str], None]) -> None:
     cpu_usage = f"{psutil.cpu_percent()}%"
 
     ram = psutil.virtual_memory()

@@ -1,5 +1,5 @@
 import os
-from typing import Callable, Optional
+from typing import Callable
 
 from classes.Command import Command
 from enums import Roles
@@ -9,7 +9,7 @@ def sticker_executor(
     image: str | None,
     download_image: Callable[[str], str | None],
     create_sticker: Callable[[str], bool],
-    send_message: Callable[[str, Optional[bool]], None],
+    send_message: Callable[[str], None],
 ) -> None:
     if not image:
         return send_message("*You need to provide an image!*")

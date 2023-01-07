@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable
 
 from classes.Command import Command
 from enums import Roles
@@ -7,7 +7,7 @@ from enums import Roles
 def whoami_executor(
     user_name: str,
     phone_number: str,
-    send_message: Callable[[str, Optional[bool]], None],
+    send_message: Callable[[str], None],
 ) -> None:
     send_message(f"You are *{user_name}* and your phone number is *{phone_number}*.")
 

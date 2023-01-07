@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable
 
 from classes.Database import Database
 from classes.Command import Command
@@ -9,7 +9,7 @@ from enums import Roles
 def role_executor(
     command_params: list[str],
     db: Database,
-    send_message: Callable[[str, Optional[bool]], None],
+    send_message: Callable[[str], None],
 ) -> None:
     if not command_params or len(command_params) < 2:
         return send_message("*You need to provide a phone number and a role name!*")

@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable
 
 from classes.Database import Database
 from classes.Command import Command
@@ -12,7 +12,7 @@ HISTORY_LIMIT = 25
 def history_executor(
     command_params: list[str],
     db: Database,
-    send_message: Callable[[str, Optional[bool]], None],
+    send_message: Callable[[str], None],
 ) -> None:
     if not command_params:
         return send_message("*You need to provide a phone number!*")
