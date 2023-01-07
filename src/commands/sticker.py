@@ -8,7 +8,7 @@ from enums import Roles
 def sticker_executor(
     image: str | None,
     download_image: Callable[[str], str | None],
-    create_sticker: Callable[[str], None],
+    create_sticker: Callable[[str], bool],
     send_message: Callable[[str, Optional[bool]], None],
 ) -> None:
     if not image:
@@ -18,7 +18,10 @@ def sticker_executor(
     if not image_path:
         return send_message("*We couldn't download your image!*\n\n_Try again..._")
 
-    create_sticker(image_path)
+    created = create_sticker(image_path)
+    if not created:
+        send_message("*We couldn't create your sticker!*\n\n_Try again..._")
+
     os.remove(image_path)
 
 

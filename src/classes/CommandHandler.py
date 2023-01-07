@@ -98,39 +98,40 @@ class CommandHandler:
 
         return image_path
 
-    def _create_sticker(self, image_path: str) -> None:
-        self.__driver.find_element(*Locators.EMOJI_MENU).click()
-        self.__driver.find_element(*Locators.FILE_INPUT).send_keys(image_path)
+    def _create_sticker(self, image_path: str) -> bool:
+        try:
+            self.__driver.find_element(*Locators.EMOJI_MENU).click()
+            self.__driver.find_element(*Locators.FILE_INPUT).send_keys(image_path)
 
-        send_button = await_element_load(
-            Locators.SEND_BUTTON, self.__driver, timeout=Timeouts.SEND_BUTTON
-        )
-        if not send_button:
-            raise CouldntHandleCommandException
+            send_button = await_element_load(
+                Locators.SEND_BUTTON, self.__driver, timeout=Timeouts.SEND_BUTTON
+            )
+            if not send_button:
+                return False
 
-        send_button.click()
+            send_button.click()
+            await_element_load(
+                Locators.PENDING_MESSAGE,
+                self.__driver,
+                timeout=Timeouts.PENDING_MESSAGE,
+            )
 
-        await_element_load(
-            Locators.PENDING_MESSAGE, self.__driver, timeout=Timeouts.PENDING_MESSAGE
-        )
+            return True
+        except NoSuchElementException:
+            return False
 
-    def _go_to_chat(self, phone_number: str) -> bool:
-        self.__driver.get(f"https://web.whatsapp.com/send/?phone={phone_number}")
+    def _go_to_chat(self, number: str) -> bool:
+        self.__driver.get(f"https://web.whatsapp.com/send/?phone={number}")
 
         if not await_element_load(
             Locators.INPUT_BOX, self.__driver, timeout=Timeouts.INPUT_BOX
         ):
             try:
                 self.__driver.find_element(*Locators.POPUP_OK_BUTTON).click()
-
-                return False
             except NoSuchElementException:
-                # One last try to find the input box.
-                try:
-                    if self.__driver.find_element(*Locators.INPUT_BOX):
-                        return True
-                except NoSuchElementException:
-                    return False
+                pass
+            finally:
+                return False
 
         return True
 
