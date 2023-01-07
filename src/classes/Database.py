@@ -44,7 +44,12 @@ class Database:
     def is_user_banned(self, number: str) -> bool | None:
         with self.__get_cursor() as cursor:
             try:
-                cursor.execute(f"SELECT * FROM banned_users WHERE number = '{number}';")
+                cursor.execute(
+                    f"""
+                        SELECT * FROM banned_users
+                        WHERE number = '{number}';
+                    """
+                )
                 is_banned = cursor.fetchone()
 
                 self.__connection.commit()
@@ -55,13 +60,14 @@ class Database:
 
                 self.__connection.rollback()
 
-                return
-
     def get_user_role(self, number: str) -> str | None:
         with self.__get_cursor() as cursor:
             try:
                 cursor.execute(
-                    f"SELECT role_name FROM user_roles WHERE number = '{number}';"
+                    f"""
+                        SELECT role_name FROM user_roles
+                        WHERE number = '{number}';
+                    """
                 )
                 data = cursor.fetchone()
                 if not data:
@@ -75,15 +81,19 @@ class Database:
 
                 self.__connection.rollback()
 
-                return
-
     def get_user_command_history(
         self, number: str, limit: int
     ) -> list[tuple[str, str]] | None:
         with self.__get_cursor() as cursor:
             try:
                 cursor.execute(
-                    f"SELECT command_name, execution_date FROM executed_commands WHERE number = '{number}' ORDER BY execution_date DESC LIMIT {limit};"
+                    f"""
+                        SELECT command_name, execution_date
+                        FROM executed_commands
+                        WHERE number = '{number}'
+                        ORDER BY execution_date DESC
+                        LIMIT {limit};
+                    """
                 )
                 data = cursor.fetchall()
                 if not data:
@@ -103,13 +113,15 @@ class Database:
 
                 self.__connection.rollback()
 
-                return
-
     def get_command_executions(self, command_name: str) -> int | None:
         with self.__get_cursor() as cursor:
             try:
                 cursor.execute(
-                    f"SELECT times_executed FROM commands WHERE command_name = '{command_name}';"
+                    f"""
+                        SELECT times_executed
+                        FROM commands
+                        WHERE command_name = '{command_name}';
+                    """
                 )
                 data = cursor.fetchone()
                 if not data:
@@ -122,8 +134,6 @@ class Database:
                 print_exception(e)
 
                 self.__connection.rollback()
-
-                return
 
     def ban_user(self, number: str, reason: str) -> bool | None:
         with self.__get_cursor() as cursor:
@@ -139,13 +149,13 @@ class Database:
 
                 return True
             except ForeignKeyViolation:
+                self.__connection.rollback()
+
                 return False
             except BaseException as e:
                 print_exception(e)
 
                 self.__connection.rollback()
-
-                return
 
     def unban_user(self, number: str) -> bool | None:
         with self.__get_cursor() as cursor:
@@ -159,21 +169,19 @@ class Database:
 
                 self.__connection.commit()
 
-                return True
+                return bool(cursor.rowcount)
             except BaseException as e:
                 print_exception(e)
 
                 self.__connection.rollback()
 
-                return False
-
-    def register_user(self, number: str, name: str) -> None:
+    def register_user(self, number: str, user_name: str) -> None:
         with self.__get_cursor() as cursor:
             try:
                 cursor.execute(
                     f"""
                         INSERT INTO users (number, user_name)
-                        SELECT '{number}', '{name}'
+                        SELECT '{number}', '{user_name}'
                         WHERE NOT EXISTS (
                             SELECT number FROM users WHERE number = '{number}'
                         );
@@ -186,12 +194,10 @@ class Database:
 
                 self.__connection.rollback()
 
-                return
-
-    def executed_command(self, number: str, name: str, command_name: str) -> None:
+    def executed_command(self, number: str, user_name: str, command_name: str) -> None:
         with self.__get_cursor() as cursor:
             try:
-                self.register_user(number, name)
+                self.register_user(number, user_name)
 
                 cursor.execute(
                     f"""
@@ -205,8 +211,6 @@ class Database:
                 print_exception(e)
 
                 self.__connection.rollback()
-
-                return
 
     def close(self) -> None:
         self.__logger.log("Closing Database session...", "CLOSE")
