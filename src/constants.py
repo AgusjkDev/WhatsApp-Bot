@@ -4,6 +4,14 @@ from dotenv import dotenv_values
 environ = dotenv_values(".env")
 
 VERSION = "0.0.0"
+COLORS = {
+    "GREEN": "\033[92m",
+    "ORANGE": "\33[93m",
+    "BLUE": "\033[94m",
+    "RED": "\033[91m",
+    "LIGHTBLUE": "\33[96m",
+    "RESET": "\033[0m",
+}
 BRAVE_PATH = "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application"
 DRIVER_ARGUMENTS = [
     "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",

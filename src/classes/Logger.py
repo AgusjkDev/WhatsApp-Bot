@@ -2,17 +2,21 @@ import os
 import time
 from colorama import just_fix_windows_console
 
-from constants import VERSION
+from constants import VERSION, COLORS
 
 
-COLORS = {
-    "DEBUG": "\033[92m",
-    "ALERT": "\33[93m",
-    "EVENT": "\033[94m",
-    "ERROR": "\033[91m",
-    "CLOSE": "\33[96m",
-    "RESET": "\033[0m",
-}
+def get_message_type_color(message_type: str) -> str:
+    match message_type:
+        case "DEBUG":
+            return COLORS["GREEN"]
+        case "ALERT":
+            return COLORS["ORANGE"]
+        case "EVENT":
+            return COLORS["LIGHTBLUE"]
+        case "ERROR":
+            return COLORS["RED"]
+        case _:
+            return COLORS["RESET"]
 
 
 class Logger:
@@ -31,7 +35,7 @@ class Logger:
             f">> [v{VERSION} | {current_time}] ¦ [{message_type}] ¦ {message}"
         )
 
-        print(COLORS[message_type] + formattedMessage + COLORS["RESET"])
+        print(get_message_type_color(message_type) + formattedMessage + COLORS["RESET"])
 
         with open(f"./logs/{current_date}.txt", "a+", encoding="utf-8") as f:
             f.write(formattedMessage + "\n")
