@@ -12,8 +12,7 @@ from .Command import Command
 from commands import commands_dict
 from utils import await_element_load
 from enums import Locators, Timeouts, Roles
-from exceptions import CouldntHandleCommandException
-from constants import COMMAND_SYMBOL
+from constants import TEMP_FOLDER, COMMAND_SYMBOL
 
 from traceback import print_exception  # Only for development purposes
 
@@ -87,7 +86,7 @@ class CommandHandler:
         if not result:
             return
 
-        image_path = f"{os.getenv('TEMP') or os.getcwd()}\\temp-{int(time.time())}.jpg"
+        image_path = f"{TEMP_FOLDER}\\temp-{int(time.time())}.jpg"
 
         with open(image_path, "wb") as f:
             f.write(base64.b64decode(result))

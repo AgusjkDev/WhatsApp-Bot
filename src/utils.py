@@ -17,7 +17,7 @@ from datetime import datetime
 
 from traceback import print_exception  # Only for development purposes
 
-from constants import BRAVE_PATH
+from constants import BRAVE_PATH, TEMP_FOLDER
 
 
 def get_driver_versions() -> list[str] | None:
@@ -103,7 +103,7 @@ def format_date(date: datetime) -> str:
 
 
 def download_random_image() -> str | None:
-    image_path = f"{os.getenv('TEMP') or os.getcwd()}\\temp-{int(time.time())}.webp"
+    image_path = f"{TEMP_FOLDER}\\temp-{int(time.time())}.webp"
 
     try:
         urllib.request.urlretrieve("https://picsum.photos/1080.webp", image_path)

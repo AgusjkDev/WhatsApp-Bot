@@ -30,7 +30,7 @@ from exceptions import (
     CouldntLogInException,
     CouldntHandleMessageException,
 )
-from constants import VERSION, BRAVE_PATH, DRIVER_ARGUMENTS
+from constants import BRAVE_PATH, DRIVER_ARGUMENTS, TEMP_FOLDER
 
 
 class Bot:
@@ -258,9 +258,7 @@ class Bot:
                 if not qr:
                     raise QrCodeException
 
-                qr_temp_file = (
-                    f"{os.getenv('TEMP') or os.getcwd()}\\temp-{int(time.time())}.png"
-                )
+                qr_temp_file = f"{TEMP_FOLDER}\\temp-{int(time.time())}.png"
                 if not qr.screenshot(qr_temp_file):
                     raise QrCodeException
 
