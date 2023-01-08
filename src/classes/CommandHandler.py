@@ -111,6 +111,7 @@ class CommandHandler:
                 self.__driver,
                 timeout=Timeouts.PENDING_MESSAGE,
             )
+            time.sleep(0.5)
 
             return True
         except NoSuchElementException:
@@ -128,6 +129,29 @@ class CommandHandler:
                 pass
             finally:
                 return False
+
+        return True
+
+    def _send_image(self, image_path: str) -> bool:
+        try:
+            self.__driver.find_element(*Locators.CLIP_BUTTON).click()
+            self.__driver.find_element(*Locators.MEDIA_INPUT).send_keys(image_path)
+        except NoSuchElementException:
+            return False
+
+        send_button = await_element_load(
+            Locators.SEND_BUTTON, self.__driver, timeout=Timeouts.SEND_BUTTON
+        )
+        if not send_button:
+            return False
+
+        send_button.click()
+        await_element_load(
+            Locators.PENDING_MESSAGE,
+            self.__driver,
+            timeout=Timeouts.PENDING_MESSAGE,
+        )
+        time.sleep(0.5)
 
         return True
 

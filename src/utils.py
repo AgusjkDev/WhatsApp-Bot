@@ -4,6 +4,8 @@ import psutil
 import time
 import subprocess
 import phonenumbers
+import urllib.request
+import requests
 from bs4 import BeautifulSoup
 from selenium.webdriver import Chrome
 from selenium.webdriver.remote.webelement import WebElement
@@ -12,6 +14,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from PIL import Image
 from datetime import datetime
+
+from traceback import print_exception  # Only for development purposes
 
 from constants import BRAVE_PATH
 
@@ -96,3 +100,27 @@ def is_valid_phone_number(phone_number: str) -> bool:
 
 def format_date(date: datetime) -> str:
     return date.strftime("%H:%M:%S, %d/%m/%Y")
+
+
+def download_random_image() -> str | None:
+    image_path = f"{os.getenv('TEMP') or os.getcwd()}\\temp-{int(time.time())}.webp"
+
+    try:
+        urllib.request.urlretrieve("https://picsum.photos/1080.webp", image_path)
+
+        return image_path
+    except Exception as e:
+        print_exception(e)
+
+
+def get_random_quote() -> dict[str, str] | None:
+    try:
+        request = requests.get("https://zenquotes.io/api/random")
+        if request.status_code != 200:
+            return
+
+        response = request.json()[0]
+
+        return {"content": response["q"], "author": response["a"]}
+    except Exception as e:
+        print_exception(e)

@@ -5,6 +5,7 @@ from .whoami import whoami
 from .sticker import sticker
 from .say import say
 from .send import send
+from .random import random
 from .resources import resources
 from .history import history
 from .executions import executions
@@ -14,6 +15,6 @@ from .role import role
 from .user import user
 
 commands_dict: dict[str, list[Command]] = {
-    "global": [menu, whoami, sticker, say, send],
+    "global": [menu, whoami, sticker, say, send, random],
     "staff": [resources, history, executions, ban, unban, role, user],
 }

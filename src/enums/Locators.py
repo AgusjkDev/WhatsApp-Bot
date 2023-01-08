@@ -48,3 +48,11 @@ class Locators:
     SEND_BUTTON = (By.XPATH, '//span[@data-testid="send"]/..')
     PENDING_MESSAGE = (By.XPATH, '//span[@data-testid="msg-time"]')
     POPUP_OK_BUTTON = (By.XPATH, '//div[@data-testid="popup-controls-ok"]')
+    CLIP_BUTTON = (
+        By.XPATH,
+        '//div[@data-testid="conversation-clip"]/div[@role="button"]',
+    )
+    MEDIA_INPUT = (
+        By.XPATH,
+        '//li[@data-testid="mi-attach-media"]/button/input[@type="file"]',
+    )

@@ -34,6 +34,8 @@
     -   Replies with the message you sent..
 -   /send _\<phone number>_**;**_\<message>_ ✅
     -   Sends a message to a specified phone number, clarifying that it is your message.
+-   /random _\<number | image | quote>_ ✅
+    -   Replies with a random number/image/quote.
 
 **Staff commands:**
 
