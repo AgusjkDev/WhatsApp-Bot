@@ -64,6 +64,7 @@ class Bot:
 
         self.__driver = self.__initialize_driver()
         if self.__driver:
+            self.__driver.maximize_window()
             self.__logger.log("Driver initialized.", "EVENT")
             self.__command_handler = CommandHandler(
                 self.__driver, self.__logger, self.__db
