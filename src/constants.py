@@ -1,3 +1,4 @@
+import os
 from dotenv import dotenv_values
 
 environ = dotenv_values(".env")
@@ -12,6 +13,7 @@ DRIVER_ARGUMENTS = [
     "--disable-gpu",
     "log-level=3",
 ]
+TEMP_FOLDER = os.getenv("TEMP") or os.getcwd()
 COMMAND_SYMBOL = "/"
 DB_CONFIG = {
     "host": environ.get("DB_HOST"),
