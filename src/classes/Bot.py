@@ -13,6 +13,7 @@ from selenium.common.exceptions import (
     StaleElementReferenceException,
 )
 
+from .Language import Language
 from .Logger import Logger
 from .Database import Database
 from .CommandHandler import CommandHandler
@@ -30,11 +31,12 @@ from exceptions import (
     CouldntLogInException,
     CouldntHandleMessageException,
 )
-from constants import VERSION, BRAVE_PATH, DRIVER_ARGUMENTS
+from constants import BRAVE_PATH, DRIVER_ARGUMENTS, TEMP_FOLDER
 
 
 class Bot:
     # Private values
+    __language: Language
     __logger: Logger
     __command_handler: CommandHandler
     __driver: Chrome
@@ -43,30 +45,32 @@ class Bot:
     error: bool
     logged: bool
 
-    def __init__(self, logger: Logger, db: Database) -> None:
+    def __init__(self, language: Language, logger: Logger, db: Database) -> None:
+        self.__language = language
         self.__logger = logger
         self.__db = db
         self.error = False
         self.logged = False
 
         if "chromedriver.exe" not in os.listdir("."):
-            self.__logger.log("Driver not found! Downloading it...", "DEBUG")
+            self.__logger.log(self.__language.BOT_DRIVER_NOT_FOUND_DOWNLOADING, "DEBUG")
 
             downloaded = self.__download_driver()
 
             if not downloaded:
-                self.__logger.log("Couldn't download the driver!", "ERROR")
+                self.__logger.log(self.__language.BOT_DRIVER_COULDNT_DOWNLOAD, "ERROR")
                 self.error = True
 
                 return
 
-            self.__logger.log("Driver downloaded successfully.", "EVENT")
+            self.__logger.log(self.__language.BOT_DRIVER_DOWNLOADED, "EVENT")
 
         self.__driver = self.__initialize_driver()
         if self.__driver:
-            self.__logger.log("Driver initialized.", "EVENT")
+            self.__driver.maximize_window()
+            self.__logger.log(self.__language.BOT_DRIVER_INITIALIZED, "EVENT")
             self.__command_handler = CommandHandler(
-                self.__driver, self.__logger, self.__db
+                self.__driver, self.__logger, self.__language, self.__db
             )
 
     def __download_driver(self) -> bool:
@@ -93,7 +97,7 @@ class Bot:
         return True
 
     def __initialize_driver(self) -> Chrome | None:
-        self.__logger.log("Initializing driver...", "DEBUG")
+        self.__logger.log(self.__language.BOT_DRIVER_INITIALIZING, "DEBUG")
 
         options = ChromeOptions()
         options.binary_location = BRAVE_PATH + "\\brave.exe"
@@ -110,11 +114,11 @@ class Bot:
             os.remove("chromedriver.exe")
 
             self.__logger.log(
-                "Invalid driver version! Downloading the correct one..", "DEBUG"
+                self.__language.BOT_DRIVER_INVALID_VERSION_DOWNLOADING, "DEBUG"
             )
 
             if not self.__download_driver():
-                self.__logger.log("Couldn't download the driver!", "ERROR")
+                self.__logger.log(self.__language.BOT_DRIVER_COULDNT_DOWNLOAD, "ERROR")
                 self.error = True
 
                 return
@@ -133,7 +137,9 @@ class Bot:
             if attempt < Attempts.PINNED_CHAT:
                 self.__driver.get("https://web.whatsapp.com")
                 self.__logger.log(
-                    f"Couldn't find a pinned chat to focus on! Trying again in {Cooldowns.PINNED_CHAT} seconds... ({attempt}/{Attempts.PINNED_CHAT})",
+                    self.__language.BOT_PINNED_CHAT_COULDNT_FIND_RETRYING.format(
+                        Cooldowns.PINNED_CHAT, attempt, Attempts.PINNED_CHAT
+                    ),
                     "ERROR",
                 )
                 time.sleep(Cooldowns.PINNED_CHAT)
@@ -142,7 +148,9 @@ class Bot:
                 continue
 
             self.__logger.log(
-                f"Couldn't find a pinned chat to focus on. ({attempt}/{Attempts.PINNED_CHAT})",
+                self.__language.BOT_PINNED_CHAT_COULDNT_FIND.format(
+                    attempt, Attempts.PINNED_CHAT
+                ),
                 "ERROR",
             )
             self.error = True
@@ -236,7 +244,7 @@ class Bot:
                 return
 
     def login(self) -> None:
-        self.__logger.log("Trying to log in...", "DEBUG")
+        self.__logger.log(self.__language.BOT_LOGIN_TRYING, "DEBUG")
 
         attempt = 1
         while True:
@@ -249,7 +257,9 @@ class Bot:
                         self.__driver,
                         timeout=Timeouts.ALREADY_LOGGED_IN,
                     ):
-                        self.__logger.log("Already logged in.", "EVENT")
+                        self.__logger.log(
+                            self.__language.BOT_LOGIN_ALREADY_LOGGED, "EVENT"
+                        )
                         self.logged = True
 
                         return
@@ -258,14 +268,12 @@ class Bot:
                 if not qr:
                     raise QrCodeException
 
-                qr_temp_file = (
-                    f"{os.getenv('TEMP') or os.getcwd()}\\temp-{int(time.time())}.png"
-                )
+                qr_temp_file = f"{TEMP_FOLDER}\\temp-{int(time.time())}.png"
                 if not qr.screenshot(qr_temp_file):
                     raise QrCodeException
 
                 opened_qr = open_qr(qr_temp_file)
-                self.__logger.log("Awaiting QR code scan...", "DEBUG")
+                self.__logger.log(self.__language.BOT_LOGIN_AWAITING_QR_SCAN, "DEBUG")
 
                 if not await_element_load(
                     Locators.LOGGING_IN, self.__driver, timeout=Timeouts.LOGGING_IN
@@ -275,27 +283,29 @@ class Bot:
                     raise CouldntLogInException
 
                 kill_process(*opened_qr)
-                self.__logger.log("Scanned, logging in...", "DEBUG")
+                self.__logger.log(self.__language.BOT_LOGIN_QR_SCANNED, "DEBUG")
 
                 if not await_element_load(
                     Locators.HEADER, self.__driver, timeout=Timeouts.HEADER
                 ):
                     raise CouldntLogInException
 
-                self.__logger.log("Logged in.", "EVENT")
+                self.__logger.log(self.__language.BOT_LOGIN_LOGGED, "EVENT")
                 self.logged = True
 
                 return
             except QrCodeException:
                 self.__logger.log(
-                    "There was an error with the QR code! Trying again...",
+                    self.__language.BOT_LOGIN_QR_ERROR,
                     "ERROR",
                 )
 
             except CouldntLogInException:
                 if attempt < Attempts.LOGIN:
                     self.__logger.log(
-                        f"Couldn't log in! Trying again in {Cooldowns.LOGIN} seconds... ({attempt}/{Attempts.LOGIN})",
+                        self.__language.BOT_LOGIN_COULDNT_LOGIN_RETRYING.format(
+                            Cooldowns.LOGIN, attempt, Attempts.LOGIN
+                        ),
                         "ERROR",
                     )
                     time.sleep(Cooldowns.LOGIN)
@@ -304,14 +314,17 @@ class Bot:
                     continue
 
                 self.__logger.log(
-                    f"Couldn't log in. ({attempt}/{Attempts.LOGIN})", "ERROR"
+                    self.__language.BOT_LOGIN_COULDNT_LOGIN.format(
+                        attempt, Attempts.LOGIN
+                    ),
+                    "ERROR",
                 )
                 self.error = True
 
                 return
 
     def handle_messages(self) -> None:
-        self.__logger.log("Handling messages...", "DEBUG")
+        self.__logger.log(self.__language.BOT_MESSAGE_HANDLING, "DEBUG")
 
         while True:
             time.sleep(0.25)
@@ -345,11 +358,14 @@ class Bot:
                             )
 
             except CouldntHandleMessageException:
-                self.__logger.log("There was an error handling a message!", "ERROR")
+                self.__logger.log(self.__language.BOT_MESSAGE_HANDLING_ERROR, "ERROR")
 
             except StaleElementReferenceException:  # If we are here and no one has been spamming, there's something wrong.
                 self.__logger.log(
-                    f"{user_name if user_name else 'An user'}{f' ({phone_number})' if phone_number else ''} is probably spamming messages!",
+                    self.__language.BOT_MESSAGE_HANDLING_SPAMMING.format(
+                        user_name if user_name else "An user",
+                        f" ({phone_number})" if phone_number else "",
+                    ),
                     "ALERT",
                 )
 
@@ -361,7 +377,7 @@ class Bot:
                 pinned_chat.click()
 
     def close(self) -> None:
-        self.__logger.log("Closing driver instance...", "CLOSE")
+        self.__logger.log(self.__language.BOT_CLOSE_CLOSING, "CLOSE")
 
         # As the driver.quit() method doesn't end brave browser processes,
         # the only way I found to do it was killing them manually.

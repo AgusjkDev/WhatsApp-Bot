@@ -6,14 +6,14 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 
+from .Language import Language
 from .Logger import Logger
 from .Database import Database
 from .Command import Command
 from commands import commands_dict
 from utils import await_element_load
 from enums import Locators, Timeouts, Roles
-from exceptions import CouldntHandleCommandException
-from constants import COMMAND_SYMBOL
+from constants import TEMP_FOLDER, COMMAND_SYMBOL
 
 from traceback import print_exception  # Only for development purposes
 
@@ -24,19 +24,25 @@ class CommandHandler:
     __logger: Logger
 
     # Protected values
+    _language: Language
     _db: Database
     _commands: dict[str, list[Command]]
 
-    def __init__(self, driver: Chrome, logger: Logger, db: Database) -> None:
+    def __init__(
+        self, driver: Chrome, logger: Logger, language: Language, db: Database
+    ) -> None:
         self.__driver = driver
         self.__logger = logger
+        self._language = language
         self._db = db
         self._commands = commands_dict
 
         for commands_type, commands in self._commands.items():
             for command in commands:
                 self.__logger.log(
-                    f"Registering {commands_type} command: {COMMAND_SYMBOL}{command.name}...",
+                    self._language.COMMAND_HANDLER_REGISTERING.format(
+                        commands_type, COMMAND_SYMBOL + command.name
+                    ),
                     "DEBUG",
                 )
 
@@ -87,7 +93,7 @@ class CommandHandler:
         if not result:
             return
 
-        image_path = f"{os.getenv('TEMP') or os.getcwd()}\\temp-{int(time.time())}.jpg"
+        image_path = f"{TEMP_FOLDER}\\temp-{int(time.time())}.jpg"
 
         with open(image_path, "wb") as f:
             f.write(base64.b64decode(result))
@@ -180,7 +186,7 @@ class CommandHandler:
         ]
         if not matched_commands:
             return self._send_message(
-                f"```Unknown command!```\n\nTry using {COMMAND_SYMBOL}menu"
+                f"*Unknown command!*\n\n_Try using {COMMAND_SYMBOL}menu_"
             )
 
         command = matched_commands[0]
@@ -188,7 +194,7 @@ class CommandHandler:
         user_role = self._db.get_user_role(number)
         user_role = user_role if user_role else Roles.DEFAULT
         if user_role not in command.roles:
-            return self._send_message("```You don't have enough permissions!```")
+            return self._send_message("*You don't have enough permissions!*")
 
         kwargs["user_role"] = user_role
 
@@ -205,13 +211,17 @@ class CommandHandler:
             total_time = f"{time.time() - time_start:.2f}"
 
             self.__logger.log(
-                f"{user_name} ({phone_number}) executed a command in {total_time}s: {COMMAND_SYMBOL}{command_name}",
+                self._language.COMMAND_HANDLER_EXECUTED_COMMAND.format(
+                    user_name, phone_number, total_time, COMMAND_SYMBOL + command_name
+                ),
                 "EVENT",
             )
             self._db.executed_command(number, user_name, command_name)
         except BaseException as e:
             self.__logger.log(
-                f"There was an error handling a command: {COMMAND_SYMBOL}{command_name}",
+                self._language.COMMAND_HANDLER_EXECUTING_ERROR.format(
+                    COMMAND_SYMBOL + command_name
+                ),
                 "ERROR",
             )
 

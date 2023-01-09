@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from typing import Any
 
+from .Language import Language
 from .Logger import Logger
 from utils import format_date
 from constants import DB_CONFIG
@@ -13,26 +14,27 @@ from traceback import print_exception  # Only for development purposes
 
 class Database:
     # Private values
+    __language: Language
+    __logger: Logger
     __connection: Any
 
     # Public values
     connected: bool
 
-    def __init__(self, logger: Logger) -> None:
+    def __init__(self, language: Language, logger: Logger) -> None:
+        self.__language = language
         self.__logger = logger
         self.connected = False
 
         if not all(DB_CONFIG.values()):
-            return self.__logger.log(
-                f"Please add the database credentials in '.env' file!", "ERROR"
-            )
+            return self.__logger.log(self.__language.DB_NO_CREDENTIALS, "ERROR")
 
-        self.__logger.log("Initializing Database...", "DEBUG")
+        self.__logger.log(self.__language.DB_INITIALIZING, "DEBUG")
 
         self.__connection = psycopg2.connect(**DB_CONFIG)
         self.connected = True
 
-        self.__logger.log("Database initialized.", "EVENT")
+        self.__logger.log(self.__language.DB_INITIALIZED, "EVENT")
 
     @contextmanager
     def __get_cursor(self):
@@ -258,6 +260,6 @@ class Database:
                 self.__connection.rollback()
 
     def close(self) -> None:
-        self.__logger.log("Closing Database session...", "CLOSE")
+        self.__logger.log(self.__language.DB_CLOSING, "CLOSE")
 
         self.__connection.close()

@@ -15,12 +15,13 @@
     -   User Roles: ✅
     -   Commands: ✅
     -   Executed Commands: ✅
--   Create i18n for these languages:
-    -   Spanish: ❌
-    -   Portuguese: ❌
-    -   Italian: ❌
-    -   French: ❌
-    -   German: ❌
+-   Available languages:
+    -   English: ✅
+    -   French: ✅
+    -   German: ✅
+    -   Italian: ✅
+    -   Portuguese: ✅
+    -   Spanish: ✅
 
 **Global commands:**
 
