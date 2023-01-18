@@ -91,7 +91,7 @@ class Bot:
         url = f"https://chromedriver.storage.googleapis.com/{version}/chromedriver_win32.zip"
         temp_file = "temp-" + str(int(time.time())) + ".zip"
         request.urlretrieve(url, temp_file)
-        ZipFile(temp_file, "r").extractall()
+        ZipFile(temp_file, "r").extract("chromedriver.exe")
         os.remove(temp_file)
 
         return True
