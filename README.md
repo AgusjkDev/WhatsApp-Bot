@@ -1,6 +1,21 @@
 # WhatsApp Bot
 
-**Objetives:**
+This WhatsApp Bot was made with **Python** using the _Selenium_ library and **PostgreSQL** for the database.
+
+## Requirements:
+
+-   All the dependency requirements are included in the `requirements.txt` file.
+-   Install the database from the `db.sql` file.
+-   Add your database credentials in a `.env` file with the next variables:
+    -   `DB_HOST`: The database host.
+    -   `DB_NAME`: The database name.
+    -   `DB_USERNAME`: The database username.
+    -   `DB_PASSWORD`: The database password.
+-   The WhatsApp application phone must have:
+    -   A pinned chat to focus on.
+    -   No access to your contacts.
+
+## Objetives:
 
 -   Show an image with the QR code to log in: ✅
 -   Handle incoming messages: ✅
@@ -23,7 +38,7 @@
     -   Portuguese: ✅
     -   Spanish: ✅
 
-**Global commands:**
+#### Global commands:
 
 -   /menu ✅
     -   Returns a list of all the available commands.
@@ -38,7 +53,7 @@
 -   /random _\<number | image | quote>_ ✅
     -   Replies with a random number/image/quote.
 
-**Staff commands:**
+#### Staff commands:
 
 -   /resources ✅
     -   Returns details about CPU and RAM usage.
