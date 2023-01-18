@@ -15,6 +15,13 @@ This WhatsApp Bot was made with **Python** using the _Selenium_ library and **Po
     -   A pinned chat to focus on.
     -   No access to your contacts.
 
+## Creating the executable:
+
+Execute this command in your terminal:
+`pyinstaller ./src/main.py --name WhatsAppBot --onefile --clean --distpath ./build --specpath ./build --version-file ../version.rc --icon ../icon.ico --key SOME_KEY`
+
+You can replace SOME_KEY with the one you prefer.
+
 ## Objetives:
 
 -   Show an image with the QR code to log in: ✅
