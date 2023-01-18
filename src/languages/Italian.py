@@ -6,6 +6,7 @@ class Italian(Language):
     MAIN_UNEXPECTED_ERROR = "Si è verificato un errore imprevisto!"
     DB_NO_CREDENTIALS = "Aggiungi le credenziali del database nel file '.env'!"
     DB_INITIALIZING = "Inizializzazione del database..."
+    DB_COULDNT_INITIALIZE = "Impossibile inizializzare il database!"
     DB_INITIALIZED = "Database inizializzato."
     DB_CLOSING = "Chiusura della sessione del database..."
     BOT_DRIVER_NOT_FOUND_DOWNLOADING = "Driver non trovato! Scaricandolo..."

@@ -31,7 +31,11 @@ class Database:
 
         self.__logger.log(self.__language.DB_INITIALIZING, "DEBUG")
 
-        self.__connection = psycopg2.connect(**DB_CONFIG)
+        try:
+            self.__connection = psycopg2.connect(**DB_CONFIG)
+        except psycopg2.OperationalError:
+            return self.__logger.log(self.__language.DB_COULDNT_INITIALIZE, "ERROR")
+
         self.connected = True
 
         self.__logger.log(self.__language.DB_INITIALIZED, "EVENT")

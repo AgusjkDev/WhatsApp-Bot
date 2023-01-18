@@ -6,6 +6,7 @@ class French(Language):
     MAIN_UNEXPECTED_ERROR = "Une erreur inattendue s'est produite !"
     DB_NO_CREDENTIALS = "Veuillez ajouter les informations d'identification de la base de données dans le fichier '.env' !"
     DB_INITIALIZING = "Initialisation de la base de données..."
+    DB_COULDNT_INITIALIZE = "Impossible d'initialiser la base de données!"
     DB_INITIALIZED = "Base de données initialisée."
     DB_CLOSING = "Fermeture de la session de base de données..."
     BOT_DRIVER_NOT_FOUND_DOWNLOADING = "Pilote introuvable! Le télécharger..."

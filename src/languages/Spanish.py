@@ -8,6 +8,7 @@ class Spanish(Language):
         "¡Por favor, añade las credenciales de la bases de datos en el archivo '.env'!"
     )
     DB_INITIALIZING = "Inicializando base de datos..."
+    DB_COULDNT_INITIALIZE = "¡No se pudo inicializar la base de datos!"
     DB_INITIALIZED = "Base de datos inicializada."
     DB_CLOSING = "Cerrando sesión de la base de datos..."
     BOT_DRIVER_NOT_FOUND_DOWNLOADING = (

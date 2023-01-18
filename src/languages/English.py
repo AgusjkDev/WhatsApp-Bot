@@ -6,6 +6,7 @@ class English(Language):
     MAIN_UNEXPECTED_ERROR = "There was an unexpected error!"
     DB_NO_CREDENTIALS = "Please add the database credentials in '.env' file!"
     DB_INITIALIZING = "Initializing Database..."
+    DB_COULDNT_INITIALIZE = "Couldn't initialize the database!"
     DB_INITIALIZED = "Database initialized."
     DB_CLOSING = "Closing Database session..."
     BOT_DRIVER_NOT_FOUND_DOWNLOADING = "Driver not found! Downloading it..."

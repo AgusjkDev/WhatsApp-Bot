@@ -8,6 +8,7 @@ class German(Language):
         "Bitte fügen Sie die Datenbankanmeldeinformationen in der '.env'-Datei hinzu!"
     )
     DB_INITIALIZING = "Datenbank wird initialisiert..."
+    DB_COULDNT_INITIALIZE = "Die Datenbank konnte nicht initialisiert werden!"
     DB_INITIALIZED = "Datenbank initialisiert."
     DB_CLOSING = "Datenbanksitzung wird geschlossen..."
     BOT_DRIVER_NOT_FOUND_DOWNLOADING = "Treiber nicht gefunden! Herunterladen..."
