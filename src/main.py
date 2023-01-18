@@ -42,11 +42,13 @@ def main():
 
         print_exception(e)
 
-    if db:
+    if db.connected:
         db.close()
 
     if bot:
         bot.close()
+
+    os.system("pause")
 
 
 if __name__ == "__main__":
