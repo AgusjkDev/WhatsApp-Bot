@@ -1,5 +1,3 @@
-CREATE DATABASE whatsapp_bot;
-
 CREATE TABLE users (
     number VARCHAR(15) PRIMARY KEY,
     user_name VARCHAR(25) NOT NULL,
@@ -129,7 +127,7 @@ VALUES ('menu', 'Returns a list of all the available commands.'),
 ('resources', 'Returns details about CPU and RAM usage.'),
 ('history', 'Returns the command history of an user, with an optional limit.'),
 ('executions', 'Returns the number of times a command has been executed.'),
+('user', 'Returns information about an user.'),
 ('ban', 'Bans the given phone number due to a reason.'),
 ('unban', 'Unbans the given phone number.'),
-('role', 'Sets a role for a given phone number.'),
-('user', 'Returns information about an user.');
+('role', 'Sets a role for a given phone number.');
