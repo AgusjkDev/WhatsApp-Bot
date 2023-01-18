@@ -8,7 +8,7 @@ class English(Language):
     DB_INITIALIZING = "Initializing Database..."
     DB_COULDNT_INITIALIZE = "Couldn't initialize the database!"
     DB_INITIALIZED = "Database initialized."
-    DB_CLOSING = "Closing Database session..."
+    DB_CLOSING = "Closing database session..."
     BOT_DRIVER_NOT_FOUND_DOWNLOADING = "Driver not found! Downloading it..."
     BOT_DRIVER_COULDNT_DOWNLOAD = "Couldn't download the driver!"
     BOT_DRIVER_DOWNLOADED = "Driver downloaded successfully."
