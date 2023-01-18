@@ -15,7 +15,7 @@ class Locators:
     )
     NEW_CHAT_CONTAINER = (By.XPATH, "../../../../..")
     CHAT_HEADER = (By.XPATH, '//header[@data-testid="conversation-header"]')
-    CHAT_INFO = (By.XPATH, '//div[@data-testid="contact-info-drawer"]')
+    CHAT_INFO = (By.XPATH, '//div[@data-testid="chat-info-drawer"]')
     BUSINESS_NAME = (By.XPATH, ".//div/section/div[1]/div[3]/div[1]/div[1]/span")
     BUSINESS_NUMBER = (
         By.XPATH,
