@@ -92,5 +92,6 @@ You can replace SOME_KEY with the one you prefer.
 
 ## Media
 
-![Video Demonstration](https://user-images.githubusercontent.com/91042041/213880294-c034e310-8edc-4ba0-9e81-c8840767e295.mp4)
+https://user-images.githubusercontent.com/91042041/213880294-c034e310-8edc-4ba0-9e81-c8840767e295.mp4
+
 ![Chat Image](https://user-images.githubusercontent.com/91042041/213880331-4f52bf85-3ff4-4f3d-b70c-3ab25d6c1dc1.png)
