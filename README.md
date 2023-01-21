@@ -6,12 +6,12 @@ This WhatsApp Bot was made with **Python** using the _Selenium_ library and **Po
 
 -   All the dependency requirements are included in the `requirements.txt` file.
 -   Install the database from the `db.sql` file.
--   Add your database credentials in a `.env` file with the next variables:
+-   Add your database credentials in a `.env` file with the variables:
     -   `DB_HOST`: The database host.
     -   `DB_NAME`: The database name.
     -   `DB_USERNAME`: The database username.
     -   `DB_PASSWORD`: The database password.
--   The WhatsApp application phone must have:
+-   The WhatsApp phone application must have:
     -   A pinned chat to focus on.
     -   No access to your contacts.
 
