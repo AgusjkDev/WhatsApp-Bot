@@ -2,6 +2,8 @@
 
 This WhatsApp Bot was made with **Python** using the _Selenium_ library and **PostgreSQL** for the database.
 
+**Disclaimer:** This bot only works in Windows and you need to have Brave Browser installed in your system.
+
 ## Requirements:
 
 -   All the dependency requirements are included in the `requirements.txt` file.
