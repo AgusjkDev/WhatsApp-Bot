@@ -1,4 +1,4 @@
-# WhatsApp Bot
+# [DEPRECATED] WhatsApp Bot
 
 This WhatsApp Bot was made with **Python** using the _Selenium_ library and **PostgreSQL** for the database.
 
